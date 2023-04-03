@@ -19,7 +19,7 @@ void FileDialog::draw_file_dialog()
         {
             std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
             JsonUtils::create_or_update_json(filePathName + "/profile.json", "SelectedProfile", filePathName, true);
-            JsonUtils::create_or_update_json(filePathName + "/profile.json", "PATCH_REENGINE_PAK", 2, false);
+            JsonUtils::create_or_update_json(filePathName + "/profile.json", "PatchReEnginePakIndex", 2, false);
 
             selected_profile_path = filePathName;
         }

@@ -45,7 +45,7 @@ bool ModManager::install_mod(const std::string &path, const std::string &modPath
     std::string pakModPrefix = "re_chunk_000.pak.patch_";
     std::string pakModSuffix = ".pak";
     nlohmann::json modFiles;
-    int pakModIndex = j["PATCH_REENGINE_PAK"];
+    int pakModIndex = j["PatchReEnginePakIndex"];
     bool isPakMod = false;
 
     for (const auto &fileEntry : std::filesystem::directory_iterator(modPath))
@@ -58,7 +58,7 @@ bool ModManager::install_mod(const std::string &path, const std::string &modPath
             {
                 isPakMod = true;
                 pakModIndex++;
-                JsonUtils::create_or_update_json(path + "/profile.json", "PATCH_REENGINE_PAK", pakModIndex, true);
+                JsonUtils::create_or_update_json(path + "/profile.json", "PatchReEnginePakIndex", pakModIndex, true);
                 break;
             }
         }
@@ -84,14 +84,6 @@ bool ModManager::install_mod(const std::string &path, const std::string &modPath
 
     for (const auto &[modFile, gameFile] : modFiles.items())
     {
-        if (std::filesystem::exists(gameFile.get<std::string>()))
-        {
-            throw std::runtime_error("Mod file already exists in game directory.");
-        }
-    }
-
-    for (const auto &[modFile, gameFile] : modFiles.items())
-    {
         std::filesystem::create_directories(std::filesystem::path(gameFile.get<std::string>()).parent_path());
         std::filesystem::copy_file(modFile, gameFile.get<std::string>(), std::filesystem::copy_options::overwrite_existing);
     }
@@ -101,26 +93,9 @@ bool ModManager::install_mod(const std::string &path, const std::string &modPath
     installedMod["InstallPath"] = modInstallPath;
     installedMod["Files"] = modFiles;
 
-    nlohmann::json modInstallations;
-    std::ifstream fileIn(path + "/" + "mods.json");
-    if (fileIn.is_open())
-    {
-        fileIn >> modInstallations;
-        fileIn.close();
-    }
+    nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods.json");
     modInstallations.push_back(installedMod);
-
     JsonUtils::write_json_to_file(path + "/" + "mods.json", modInstallations);
-    std::ofstream fileOut(path + "/" + "mods.json");
-    if (fileOut.is_open())
-    {
-        fileOut << modInstallations.dump(4);
-        fileOut.close();
-    }
-    else
-    {
-        throw std::runtime_error("Failed to open mods.json.");
-    }
 
     return true;
 }
@@ -200,7 +175,7 @@ bool ModManager::uninstall_pak_mod(const ModEntry &modEntry, const std::string &
     }
 
     std::vector<nlohmann::json> pakModsToReinstall = ModManager::remove_mod_from_list(pakModInstallations, modEntry.Path, path + "/Game/");
-    JsonUtils::create_or_update_json(path + "/profile.json", "PATCH_REENGINE_PAK", 2, true);
+    JsonUtils::create_or_update_json(path + "/profile.json", "PatchReEnginePakIndex", 2, true);
 
     for (auto &modToReinstall : pakModsToReinstall)
     {
