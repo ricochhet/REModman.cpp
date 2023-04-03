@@ -1,41 +1,19 @@
-#include <Window.h>
+#include <ImGuiWindow.h>
 
 static void glfw_error_callback(int error, const char *description)
 {
     std::cerr << "GLFW Error " << error << ": " << description << std::endl;
 }
 
-int Window::BaseWindow()
+void ImGuiWindow::setup_imgui_fonts(const ImGuiIO &io)
 {
-    // Setup window
-    glfwSetErrorCallback(glfw_error_callback);
-    if (!glfwInit())
-    {
-        return 1;
-    }
-
-    GLFWwindow *window = glfwCreateWindow(800, 600, "ImGui Example", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return 1;
-    }
-
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-
-    // Setup ImGui binding
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
     io.Fonts->Clear();
     io.Fonts->AddFontFromMemoryCompressedTTF(RobotoMedium_compressed_data, RobotoMedium_compressed_size, (float)16);
     io.Fonts->Build();
-    (void)io;
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+}
 
-    // Setup style
+void ImGuiWindow::setup_imgui_style()
+{
     ImGui::StyleColorsDark();
 
     auto &style = ImGui::GetStyle();
@@ -93,6 +71,36 @@ int Window::BaseWindow()
     colors[ImGuiCol_TitleBg] = ImVec4{0.25f, 0.2505f, 0.251f, 1.0f};
     colors[ImGuiCol_TitleBgActive] = ImVec4{0.55f, 0.5505f, 0.551f, 1.0f};
     colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.25f, 0.2505f, 0.251f, 1.0f};
+}
+
+int ImGuiWindow::create_imgui_window()
+{
+    // Setup window
+    glfwSetErrorCallback(glfw_error_callback);
+    if (!glfwInit())
+    {
+        return 1;
+    }
+
+    GLFWwindow *window = glfwCreateWindow(800, 600, "ImGui Example", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        return 1;
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+
+    // Setup ImGui binding
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    setup_imgui_fonts(io);
+    (void)io;
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+    setup_imgui_style();
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -113,7 +121,7 @@ int Window::BaseWindow()
         // Create an ImGui window that fills the entire viewport
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
         ImGui::Begin("Main", NULL, window_flags);
-        Window::ImGuiWindow();
+        ImGuiWindow::setup_imgui_window();
         ImGui::End();
 
         // Rendering

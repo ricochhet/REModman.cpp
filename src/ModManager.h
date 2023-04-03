@@ -10,11 +10,6 @@
 #include <JsonUtils.h>
 #include <Utils.h>
 
-std::vector<std::string> GameSelection = {
-    "None",
-    "MonsterHunterRise",
-    "MonsterHunterWorld"};
-
 struct ModEntry
 {
     std::string Name;
@@ -24,6 +19,8 @@ struct ModEntry
 namespace ModManager
 {
     std::vector<ModEntry> get_mod_entries(const std::string &path);
+    std::vector<ModEntry> get_uninstalled_mod_entries(const std::string &path);
+    std::vector<nlohmann::json> get_installed_mod_entries(const std::string &path);
     bool contains_pak_files(const std::string &path);
     bool install_mod(const std::string &path, const std::string &modPath, const std::string &gamePath, const std::string &modInstallPath);
     bool uninstall_mod(const std::string &path, const std::string &modPath, const std::string &modInstallPath);

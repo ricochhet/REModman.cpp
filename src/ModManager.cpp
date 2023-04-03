@@ -2,6 +2,11 @@
 
 std::vector<ModEntry> ModManager::get_mod_entries(const std::string &path)
 {
+    if (!std::filesystem::exists(path))
+    {
+        throw;
+    }
+
     std::vector<ModEntry> modEntries;
 
     for (const auto &fileEntry : std::filesystem::directory_iterator(path + "/Mods/"))
@@ -18,8 +23,63 @@ std::vector<ModEntry> ModManager::get_mod_entries(const std::string &path)
     return modEntries;
 }
 
+std::vector<ModEntry> ModManager::get_uninstalled_mod_entries(const std::string &path)
+{
+    if (!std::filesystem::exists(path))
+    {
+        throw;
+    }
+
+    nlohmann::json modInstallations = JsonUtils::load_json(path + "/mods.json");
+    std::vector<ModEntry> modEntries = get_mod_entries(path);
+    std::vector<ModEntry> currentModEntries;
+
+    for (auto& entry : modEntries)
+    {
+        bool found = false;
+        for (auto& installedMod : modInstallations)
+        {
+            if (installedMod["SourcePath"] == entry.Path)
+            {
+                found = true;
+                break;
+            }
+        }
+        
+        if (!found)
+        {
+            currentModEntries.push_back(entry);
+        }
+    }
+
+    return currentModEntries;
+}
+
+std::vector<nlohmann::json> ModManager::get_installed_mod_entries(const std::string &path)
+{
+    if (!std::filesystem::exists(path))
+    {
+        throw;
+    }
+
+    nlohmann::json modInstallations = JsonUtils::load_json(path + "/mods.json");
+    std::vector<nlohmann::json> modInstallationEntries;
+
+    for (auto &installedMod : modInstallations)
+    {
+        modInstallationEntries.push_back(installedMod);
+    }
+
+    return modInstallationEntries;
+}
+
 bool ModManager::contains_pak_files(const std::string &path)
 {
+    if (!std::filesystem::exists(path))
+    {
+        throw;
+    }
+
     bool isPakMod = false;
 
     for (const auto &fileEntry : std::filesystem::directory_iterator(path))
@@ -41,6 +101,11 @@ bool ModManager::contains_pak_files(const std::string &path)
 
 bool ModManager::install_mod(const std::string &path, const std::string &modPath, const std::string &gamePath, const std::string &modInstallPath)
 {
+    if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath) || !std::filesystem::exists(gamePath))
+    {
+        return false;
+    }
+
     nlohmann::json j = JsonUtils::load_json(path + "/profile.json");
     std::string pakModPrefix = "re_chunk_000.pak.patch_";
     std::string pakModSuffix = ".pak";
@@ -102,6 +167,11 @@ bool ModManager::install_mod(const std::string &path, const std::string &modPath
 
 bool ModManager::uninstall_mod(const std::string &path, const std::string &modPath, const std::string &modInstallPath)
 {
+    if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath))
+    {
+        return false;
+    }
+
     nlohmann::json modInstallations;
     std::ifstream fileIn(path + "/" + "mods.json");
     if (fileIn.is_open())
@@ -148,6 +218,11 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
 
 bool ModManager::uninstall_pak_mod(const ModEntry &modEntry, const std::string &path, const std::string &modPath, const std::string &modInstallPath)
 {
+    if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath))
+    {
+        return false;
+    }
+
     nlohmann::json modInstallations = JsonUtils::load_json(path + "/mods.json");
     std::vector<nlohmann::json> pakModInstallations;
 
@@ -181,10 +256,17 @@ bool ModManager::uninstall_pak_mod(const ModEntry &modEntry, const std::string &
     {
         ModManager::install_mod(path, modToReinstall["SourcePath"], path + "/Game/", path + "/Game/");
     }
+
+    return true;
 }
 
 std::vector<nlohmann::json> ModManager::remove_mod_from_list(const std::vector<nlohmann::json> &listToPatch, const std::string &modPath, const std::string &modInstallPath)
 {
+    if (!std::filesystem::exists(modPath))
+    {
+        throw;
+    }
+
     std::vector<nlohmann::json> modInstallations = listToPatch;
 
     for (auto it = modInstallations.begin(); it != modInstallations.end();)

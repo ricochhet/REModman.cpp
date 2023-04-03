@@ -7,6 +7,7 @@
 #include <ImGuiFileDialog.h>
 #include <JsonUtils.h>
 #include <ModManager.h>
+#include <Logger.h>
 
 namespace FileDialog
 {
@@ -18,6 +19,7 @@ namespace REModman
     void draw_load_profile();
     void draw_game_selector();
     void draw_mod_list();
+    void draw_installed_mod_list();
 }
 
 #endif REMODMAN_INCLUDED

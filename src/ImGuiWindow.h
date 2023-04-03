@@ -1,5 +1,5 @@
-#ifndef REMODMAN_WINDOW_INCLUDED
-#define REMODMAN_WINDOW_INCLUDED
+#ifndef REMODMAN_IMGUIWINDOW_INCLUDED
+#define REMODMAN_IMGUIWINDOW_INCLUDED
 #pragma once
 
 #include <iostream>
@@ -14,10 +14,12 @@
 #include <font_robotomedium.h>
 #include <REModman.h>
 
-namespace Window
+namespace ImGuiWindow
 {
-    int BaseWindow();
-    void ImGuiWindow();
+    int create_imgui_window();
+    void setup_imgui_fonts(const ImGuiIO &io);
+    void setup_imgui_style();
+    void setup_imgui_window();
 }
 
-#endif REMODMAN_WINDOW_INCLUDED
+#endif REMODMAN_IMGUIWINDOW_INCLUDED

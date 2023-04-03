@@ -2,9 +2,16 @@
 
 static int game_selection_index = 0;
 std::string selected_profile_path;
+std::vector<ModEntry> uninstalled_mod_entries;
+nlohmann::json installed_mod_entries;
 
 ImVec2 popup_modal_size(400, 200);
 ImVec2 popup_modal_pos(0, 0);
+
+std::vector<std::string> GameSelection = {
+    "None",
+    "MonsterHunterRise",
+    "MonsterHunterWorld"};
 
 void FileDialog::draw_file_dialog()
 {
@@ -22,6 +29,10 @@ void FileDialog::draw_file_dialog()
             JsonUtils::create_or_update_json(filePathName + "/profile.json", "PatchReEnginePakIndex", 2, false);
 
             selected_profile_path = filePathName;
+
+            game_selection_index = ModManager::get_game_selection(selected_profile_path);
+            uninstalled_mod_entries = ModManager::get_uninstalled_mod_entries(selected_profile_path);
+            installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
         }
 
         ImGuiFileDialog::Instance()->Close();
@@ -77,7 +88,7 @@ void REModman::draw_mod_list()
 
         ImGui::TreePush("Mods");
 
-        for (auto &it : ModManager::get_mod_entries(selected_profile_path))
+        for (auto &it : uninstalled_mod_entries)
         {
             std::string label = it.Name;
 
@@ -94,6 +105,9 @@ void REModman::draw_mod_list()
                 if (ImGui::Button("Install"))
                 {
                     ModManager::install_mod(selected_profile_path, it.Path, selected_profile_path + "/Game/", selected_profile_path + "/Game/");
+
+                    uninstalled_mod_entries = ModManager::get_uninstalled_mod_entries(selected_profile_path);
+                    installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
                 }
 
                 ImGui::SameLine();
@@ -108,6 +122,9 @@ void REModman::draw_mod_list()
                     {
                         ModManager::uninstall_mod(selected_profile_path, it.Path, selected_profile_path + "/Game/");
                     }
+
+                    uninstalled_mod_entries = ModManager::get_uninstalled_mod_entries(selected_profile_path);
+                    installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
                 }
                 ImGui::Separator();
                 if (ImGui::Button("Exit"))
@@ -115,6 +132,32 @@ void REModman::draw_mod_list()
                     ImGui::CloseCurrentPopup();
                 }
                 ImGui::EndPopup();
+            }
+        }
+
+        ImGui::TreePop();
+    }
+}
+
+void REModman::draw_installed_mod_list()
+{
+    ImGui::Separator();
+    if (!selected_profile_path.empty())
+    {
+        if (!ImGui::CollapsingHeader("Installed Mods"))
+        {
+            return;
+        }
+
+        ImGui::TreePush("Installed Mods");
+
+        for (auto &it : installed_mod_entries)
+        {
+            std::filesystem::path sourcePath = it["SourcePath"];
+
+            if (ImGui::Button(sourcePath.filename().string().c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+            {
+                //
             }
         }
 
