@@ -12,6 +12,7 @@
 
 namespace ModManager
 {
+    void init_checks(const std::string &path);
     std::vector<nlohmann::json> get_mod_entries(const std::string &path);
     std::vector<nlohmann::json> get_staged_mod_entries(const std::string &path);
     std::vector<nlohmann::json> get_available_mod_entries(const std::string &path);

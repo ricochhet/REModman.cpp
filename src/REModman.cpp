@@ -2,6 +2,7 @@
 
 static int game_selection_index = 0;
 std::string selected_profile_path;
+std::string selected_game_path;
 std::vector<nlohmann::json> staged_mod_entries;
 std::vector<nlohmann::json> available_mod_entries;
 std::vector<nlohmann::json> installed_mod_entries;
@@ -12,7 +13,7 @@ std::vector<std::string> GameSelection = {
     "MonsterHunterRise",
     "MonsterHunterWorld"};
 
-void FileDialog::draw_file_dialog()
+void FileDialog::draw_load_profile_dialog()
 {
     if (ImGui::Button("Load Profile"))
     {
@@ -24,9 +25,13 @@ void FileDialog::draw_file_dialog()
         if (ImGuiFileDialog::Instance()->IsOk())
         {
             std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            JsonUtils::create_or_update_json(filePathName + "/profile.json", "SelectedProfile", filePathName, true);
-            JsonUtils::create_or_update_json(filePathName + "/profile.json", "PatchReEnginePakIndex", 2, false);
+            JsonUtils::create_or_update_json(filePathName + "/" + "profile.json", "SelectedProfile", filePathName, true);
+            JsonUtils::create_or_update_json(filePathName + "/" + "profile.json", "PatchReEnginePakIndex", 2, false);
             selected_profile_path = filePathName;
+
+            ModManager::init_checks(selected_profile_path + "/" + "profile.json");
+            ModManager::init_checks(selected_profile_path + "/" + "mods_staging.json");
+            ModManager::init_checks(selected_profile_path + "/" + "mods_installed.json");
 
             game_selection_index = ModManager::get_game_selection(selected_profile_path);
             staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
@@ -38,15 +43,49 @@ void FileDialog::draw_file_dialog()
     }
 }
 
+void FileDialog::draw_get_game_path_dialog()
+{
+    if (ImGui::Button(("Get game folder for " + GameSelection[game_selection_index]).c_str()))
+    {
+        ImGuiFileDialog::Instance()->OpenDialog("GetGameInstallDlgKey", "Choose Folder", nullptr, "");
+    }
+
+    if (ImGuiFileDialog::Instance()->Display("GetGameInstallDlgKey"))
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            JsonUtils::create_or_update_json(filePathName + "/" + "profile.json", GameSelection[game_selection_index] + "GamePath", filePathName, true);
+            selected_profile_path = filePathName;
+        }
+
+        ImGuiFileDialog::Instance()->Close();
+    }
+}
+
 void REModman::draw_load_profile()
 {
-    FileDialog::draw_file_dialog();
+    FileDialog::draw_load_profile_dialog();
 
     if (!selected_profile_path.empty())
     {
         ImGui::SameLine();
         std::string label = "Loaded profile: " + selected_profile_path;
         ImGui::Text(label.c_str());
+    }
+}
+
+void REModman::draw_get_game_path()
+{
+    if (!selected_profile_path.empty())
+    {
+        FileDialog::draw_get_game_path_dialog();
+
+        if (!selected_game_path.empty())
+        {
+            std::string label = "Game folder: " + selected_game_path;
+            ImGui::Text(label.c_str());
+        }
     }
 }
 
@@ -109,7 +148,7 @@ void REModman::draw_mod_list()
                 ImGui::InputInt("Load Order", &load_order);
                 if (ImGui::Button("Add"))
                 {
-                    ModManager::stage_mod(selected_profile_path, available_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/", selected_profile_path + "/Game/", load_order);
+                    ModManager::stage_mod(selected_profile_path, available_mod_entries[i]["SourcePath"], selected_game_path, selected_game_path, load_order);
 
                     staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
                     available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
@@ -160,7 +199,7 @@ void REModman::draw_staging_mod_list()
 
                 if (ImGui::Button("Remove"))
                 {
-                    ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/");
+                    ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_game_path);
                     staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
                     available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
                     installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
@@ -189,18 +228,18 @@ void REModman::draw_mod_deploy_button()
             {
                 if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]["SourcePath"]))
                 {
-                    ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/");
+                    ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_game_path);
                 }
                 else
                 {
-                    ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/");
+                    ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_game_path);
                 }
             }
 
             for (int i = 0; i < staged_mod_entries.size(); i++)
             {
-                ModManager::install_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/", selected_profile_path + "/Game/");
-                ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/");
+                ModManager::install_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_game_path, selected_game_path);
+                ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_game_path);
             }
 
             staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);

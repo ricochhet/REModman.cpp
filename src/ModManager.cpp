@@ -1,5 +1,17 @@
 #include <ModManager.h>
 
+void ModManager::init_checks(const std::string &path)
+{
+    std::ifstream file_check(path);
+    
+    if (!file_check.good()) {
+        std::ofstream file_create(path);
+        nlohmann::json empty_array = nlohmann::json::array();
+        file_create << empty_array;
+        file_create.close();
+    }
+}
+
 std::vector<nlohmann::json> ModManager::get_mod_entries(const std::string &path)
 {
     if (!std::filesystem::exists(path))
@@ -152,6 +164,8 @@ bool ModManager::destage_mod(const std::string &path, const std::string &modPath
     std::vector<nlohmann::json> j = JsonUtils::load_json(path + "/" + "mods_staging.json");
     j = ModManager::remove_mod_from_list(j, modPath, modInstallPath);
     JsonUtils::write_json_to_file(path + "/" + "mods_staging.json", j);
+    
+    return true;
 }
 
 bool ModManager::install_mod(const std::string &path, const std::string &modPath, const std::string &gamePath, const std::string &modInstallPath)
