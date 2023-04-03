@@ -5,14 +5,13 @@
 
 #include <imgui.h>
 #include <lua.hpp>
+#include <iostream>
+#include <Logger.h>
 
 namespace LuaBindings
 {
-    void imgui_ctx(lua_State *L, ImGuiContext *ctx);
-    int create_button(lua_State *L);
-    void load_lua(lua_State *L);
-    void bind_create_button(lua_State *L);
-    // int create_lua_state(lua_State *L, ImGuiContext *ctx);
+    int create_lua_state();
+    int logger(lua_State *L);
 }
 
 #endif REMODMAN_LUABINDINGS_INCLUDED

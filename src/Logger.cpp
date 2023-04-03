@@ -30,7 +30,7 @@ int Logger::getColorCode(LogLevel level)
 
 void Logger::log(const std::string &message, LogLevel level)
 {
-    if (level >= m_logLevel)
+    if (level <= m_logLevel)
     {
         std::cout << "\033[1;" << getColorCode(level) << "m";
 
