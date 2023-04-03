@@ -19,7 +19,7 @@ int main()
     Logger::getInstance().setLogLevel(LogLevel::Error);
     Logger::getInstance().log("Logger initialized.", LogLevel::Error);
 
-    LuaBindings::create_lua_state();
 
     ImGuiWindow::create_imgui_window();
+    LuaBindings::create_lua_state();
 }

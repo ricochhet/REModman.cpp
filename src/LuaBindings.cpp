@@ -11,9 +11,14 @@ int LuaBindings::create_lua_state()
 {
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
-    lua_register(L, "logger", LuaBindings::logger);
-
     luaL_loadfilex(L, "script.lua", 0);
-    lua_call(L, 0, 0);
+
+    lua_CFunction chunk = lua_tocfunction(L, -1);
+    lua_pushcfunction(L, chunk);
+    lua_register(L, "logger", LuaBindings::logger);
+    lua_call(L, 1, 0);
+
+    // lua_close(L);
+    
     return 0;
 }
