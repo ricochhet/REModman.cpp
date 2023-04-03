@@ -50,8 +50,7 @@ void Logger::log(const std::string &message, LogLevel level)
             break;
         }
 
-        std::cout << message << "\033[0m\n"
-                  << std::endl;
+        std::cout << message << "\033[0m\n";
     }
 }
 

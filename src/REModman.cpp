@@ -4,9 +4,7 @@ static int game_selection_index = 0;
 std::string selected_profile_path;
 std::vector<nlohmann::json> uninstalled_mod_entries;
 std::vector<nlohmann::json> installed_mod_entries;
-
 ImVec2 popup_modal_size(400, 200);
-ImVec2 popup_modal_pos(0, 0);
 
 std::vector<std::string> GameSelection = {
     "None",
@@ -87,7 +85,7 @@ void REModman::draw_mod_list()
         }
 
         ImGui::TreePush("Mods");
-        ImGui::BeginListBox("##List", ImVec2(-1, 0));
+        ImGui::BeginListBox("##ModsList", ImVec2(-1, 0));
 
         for (int i = 0; i < uninstalled_mod_entries.size(); i++)
         {
@@ -102,7 +100,9 @@ void REModman::draw_mod_list()
             if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
             {
                 ImGui::SetWindowSize(popup_modal_size);
-                ImGui::SetWindowPos(popup_modal_pos);
+                ImGui::SetWindowPos(ImVec2(
+                    (ImGui::GetIO().DisplaySize.x / 2) - ImGui::GetContentRegionAvail().x / 2,
+                    (ImGui::GetIO().DisplaySize.y / 2) - ImGui::GetContentRegionAvail().y / 2));
 
                 if (ImGui::Button("Install"))
                 {
@@ -135,7 +135,7 @@ void REModman::draw_installed_mod_list()
         }
 
         ImGui::TreePush("Installed Mods");
-        ImGui::BeginListBox("##List", ImVec2(-1, 0));
+        ImGui::BeginListBox("##InstalledModList", ImVec2(-1, 0));
 
         for (int i = 0; i < installed_mod_entries.size(); i++)
         {
@@ -150,7 +150,9 @@ void REModman::draw_installed_mod_list()
             if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
             {
                 ImGui::SetWindowSize(popup_modal_size);
-                ImGui::SetWindowPos(popup_modal_pos);
+                ImGui::SetWindowPos(ImVec2(
+                    (ImGui::GetIO().DisplaySize.x / 2) - ImGui::GetContentRegionAvail().x / 2,
+                    (ImGui::GetIO().DisplaySize.y / 2) - ImGui::GetContentRegionAvail().y / 2));
 
                 if (ImGui::Button("Uninstall"))
                 {
