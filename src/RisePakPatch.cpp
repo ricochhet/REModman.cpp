@@ -1,23 +1,12 @@
 #include <RisePakPatch.h>
 
-std::vector<char> ReadAllBytes(const std::string &path)
+std::vector<char> read_all_bytes(const std::string &path)
 {
     std::ifstream input_file(path, std::ios::binary);
     std::vector<char> bytes(
         (std::istreambuf_iterator<char>(input_file)),
         (std::istreambuf_iterator<char>()));
     return bytes;
-}
-
-std::string replace_all(std::string input, const std::string &search, const std::string &replace)
-{
-    size_t pos = 0;
-    while ((pos = input.find(search, pos)) != std::string::npos)
-    {
-        input.replace(pos, search.length(), replace);
-        pos += replace.length();
-    }
-    return input;
 }
 
 std::string to_lower(const std::string &str)
@@ -47,7 +36,6 @@ void RisePakPatch::ProcessDirectory(const std::string &path, const std::string &
 
     if (std::filesystem::exists(outputFile))
     {
-        std::cout << "Deleting existing output file..." << std::endl;
         std::filesystem::remove(outputFile);
     }
 
@@ -66,8 +54,6 @@ void RisePakPatch::ProcessDirectory(const std::string &path, const std::string &
         }
         return std::filesystem::path(a).parent_path() < std::filesystem::path(b).parent_path(); });
 
-    std::cout << "Processing " << sortedFiles.size() << " files..." << std::endl;
-
     std::vector<FileEntry> list;
     Writer writer(outputFile);
     writer.WriteUInt32(1095454795u);
@@ -79,8 +65,8 @@ void RisePakPatch::ProcessDirectory(const std::string &path, const std::string &
     for (const std::string &obj : sortedFiles)
     {
         FileEntry fileEntry2;
-        std::string text = replace_all(obj, directory, "");
-        text = replace_all(text, "\\", "/");
+        std::string text = Utils::string_replace_all(obj, directory, "");
+        text = Utils::string_replace_all(text, "\\", "/");
 
         if (text[0] == '/')
         {
@@ -89,13 +75,13 @@ void RisePakPatch::ProcessDirectory(const std::string &path, const std::string &
 
         uint32_t hash = murmurhash3(to_lower(text).c_str(), UINT_MAX);
         uint32_t hash2 = murmurhash3(to_upper(text).c_str(), UINT_MAX);
-        std::vector<char> array2 = ReadAllBytes(obj);
+        std::vector<char> array2 = read_all_bytes(obj);
 
-        fileEntry2.filename = text;
+        fileEntry2.fileName = text;
         fileEntry2.offset = (uint64_t)writer.Position();
         fileEntry2.uncompSize = (uint64_t)array2.size();
-        fileEntry2.filenameLower = hash;
-        fileEntry2.filenameUpper = hash2;
+        fileEntry2.fileNameLower = hash;
+        fileEntry2.fileNameUpper = hash2;
 
         list.emplace_back(fileEntry2);
         writer.Write(array2.data(), array2.size());
@@ -104,9 +90,8 @@ void RisePakPatch::ProcessDirectory(const std::string &path, const std::string &
     writer.SeekFromBeginning(16);
     for (const FileEntry &item : list)
     {
-        std::cout << item.filename << ", " << item.filenameLower << ", " << item.filenameUpper << std::endl;
-        writer.WriteUInt32(item.filenameLower);
-        writer.WriteUInt32(item.filenameUpper);
+        writer.WriteUInt32(item.fileNameLower);
+        writer.WriteUInt32(item.fileNameUpper);
         writer.WriteUInt64(item.offset);
         writer.WriteUInt64(item.uncompSize);
         writer.WriteUInt64(item.uncompSize);

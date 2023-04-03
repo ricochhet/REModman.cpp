@@ -1,4 +1,5 @@
-#ifndef __WINDOW_H
+#ifndef REMODMAN_WINDOW_INCLUDED
+#define REMODMAN_WINDOW_INCLUDED
 #pragma once
 
 #include <iostream>
@@ -8,10 +9,10 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
-#include <Manager.h>
-#include <Json.h>
-#include <Murmur3.h>
+#include <JsonUtils.h>
+#include <murmurhash.h>
 #include <font_robotomedium.h>
+#include <REModman.h>
 
 namespace Window
 {
@@ -19,4 +20,4 @@ namespace Window
     void ImGuiWindow();
 }
 
-#endif __WINDOW_h
+#endif REMODMAN_WINDOW_INCLUDED

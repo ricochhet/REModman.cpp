@@ -1,7 +1,14 @@
 #include <Window.h>
 
+void Window::ImGuiWindow()
+{
+    REModman::draw_load_profile();
+    REModman::draw_game_selector();
+    ImGui::SameLine();
+    REModman::draw_mod_list();
+}
+
 int main()
 {
-    // RisePakPatch::ProcessDirectory("../TestPaks/TestMod", "re_chunk_000.pak.patch_001.pak");
     Window::BaseWindow();
 }

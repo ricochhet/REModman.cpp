@@ -1,18 +1,21 @@
-#ifndef __RE_RISEPAKPATCH_H
+#ifndef REMODMAN_RISEPAKPATCH_INCLUDED
+#define REMODMAN_RISEPAKPATCH_INCLUDED
+
 #pragma once
 
+#include <MurmurHash.h>
+#include <filesystem>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
-#include <filesystem>
 #include <vector>
-#include <algorithm>
-#include <Murmur3.h>
+#include <Utils.h>
 
 struct FileEntry
 {
-    std::string filename;
-    uint32_t filenameLower;
-    uint32_t filenameUpper;
+    std::string fileName;
+    uint32_t fileNameLower;
+    uint32_t fileNameUpper;
     uint64_t offset;
     uint64_t uncompSize;
 };
@@ -40,9 +43,9 @@ public:
     {
         outStream.write(data, count);
     }
-    void Seek(std::streampos pos)
+    void Seek(std::streampos position)
     {
-        outStream.seekp(pos);
+        outStream.seekp(position);
     }
     void SeekFromBeginning(std::size_t position)
     {
@@ -66,4 +69,4 @@ namespace RisePakPatch
     void ProcessDirectory(const std::string &path, const std::string &outputFile);
 }
 
-#endif __RE_RISEPAKPATCH_H
+#endif REMODMAN_RISEPAKPATCH_INCLUDED
