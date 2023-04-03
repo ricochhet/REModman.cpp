@@ -13,6 +13,7 @@
 #include <murmurhash.h>
 #include <font_robotomedium.h>
 #include <REModman.h>
+#include <LuaBindings.h>
 
 namespace ImGuiWindow
 {

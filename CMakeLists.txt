@@ -58,6 +58,41 @@ set(MURMURHASH3_SOURCES
     "${CMAKE_SOURCE_DIR}/dependencies/MurmurHash3/MurmurHash3.cpp"
 )
 
+set(LUA_SOURCES
+    "dependencies/lua/src/lapi.c"
+    "dependencies/lua/src/lauxlib.c"
+    "dependencies/lua/src/lbaselib.c"
+    "dependencies/lua/src/lcode.c"
+    "dependencies/lua/src/lcorolib.c"
+    "dependencies/lua/src/lctype.c"
+    "dependencies/lua/src/ldblib.c"
+    "dependencies/lua/src/ldebug.c"
+    "dependencies/lua/src/ldo.c"
+    "dependencies/lua/src/ldump.c"
+    "dependencies/lua/src/lfunc.c"
+    "dependencies/lua/src/lgc.c"
+    "dependencies/lua/src/linit.c"
+    "dependencies/lua/src/liolib.c"
+    "dependencies/lua/src/llex.c"
+    "dependencies/lua/src/lmathlib.c"
+    "dependencies/lua/src/lmem.c"
+    "dependencies/lua/src/loadlib.c"
+    "dependencies/lua/src/lobject.c"
+    "dependencies/lua/src/lopcodes.c"
+    "dependencies/lua/src/loslib.c"
+    "dependencies/lua/src/lparser.c"
+    "dependencies/lua/src/lstate.c"
+    "dependencies/lua/src/lstring.c"
+    "dependencies/lua/src/lstrlib.c"
+    "dependencies/lua/src/ltable.c"
+    "dependencies/lua/src/ltablib.c"
+    "dependencies/lua/src/ltm.c"
+    "dependencies/lua/src/lundump.c"
+    "dependencies/lua/src/lutf8lib.c"
+    "dependencies/lua/src/lvm.c"
+    "dependencies/lua/src/lzio.c"
+)
+
 include_directories(
     ${CMAKE_SOURCE_DIR}/dependencies/imgui
     ${CMAKE_SOURCE_DIR}/dependencies/nlohmann
@@ -65,6 +100,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/dependencies/glfw/include
     ${CMAKE_SOURCE_DIR}/dependencies/ImGuiFileDialog
     ${CMAKE_SOURCE_DIR}/dependencies/utfcpp/source
+    ${CMAKE_SOURCE_DIR}/dependencies/lua/src
     ${CMAKE_SOURCE_DIR}/src/resources
     ${CMAKE_SOURCE_DIR}/src
 )
@@ -72,7 +108,7 @@ include_directories(
 add_definitions(-DIMGUI_DEFINE_MATH_OPERATORS)
 
 file(GLOB SOURCES "src/*.cpp" "src/include/*.h")
-add_executable(imgui_standalone_window ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_HEADERS} ${IMGUI_FILE_DIALOG_SOURCES} ${IMGUI_FILE_DIALOG_HEADERS} ${NLOHMANN_JSON_SOURCES} ${UTFCPP_SOURCES} ${MURMURHASH3_SOURCES})
+add_executable(imgui_standalone_window ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_HEADERS} ${LUA_SOURCES} ${IMGUI_FILE_DIALOG_SOURCES} ${IMGUI_FILE_DIALOG_HEADERS} ${NLOHMANN_JSON_SOURCES} ${UTFCPP_SOURCES} ${MURMURHASH3_SOURCES})
 
 target_link_libraries(imgui_standalone_window glfw)
 find_package(OpenGL REQUIRED)

@@ -92,9 +92,9 @@ int ImGuiWindow::create_imgui_window()
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    // Setup ImGui binding
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+
     ImGuiIO &io = ImGui::GetIO();
     setup_imgui_fonts(io);
     (void)io;
