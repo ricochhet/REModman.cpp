@@ -18,7 +18,10 @@ namespace REModman
 {
     void draw_load_profile();
     void draw_game_selector();
+    
     void draw_mod_list();
+    void draw_staging_mod_list();
+    void draw_mod_deploy_button();
     void draw_installed_mod_list();
 }
 

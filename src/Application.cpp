@@ -6,7 +6,10 @@ void ImGuiWindow::setup_imgui_window()
     REModman::draw_load_profile();
     ImGui::SameLine();
     REModman::draw_game_selector();
+    
     REModman::draw_mod_list();
+    REModman::draw_staging_mod_list();
+    REModman::draw_mod_deploy_button();
     REModman::draw_installed_mod_list();
 }
 

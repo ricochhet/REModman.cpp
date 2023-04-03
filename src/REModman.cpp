@@ -2,6 +2,7 @@
 
 static int game_selection_index = 0;
 std::string selected_profile_path;
+std::vector<nlohmann::json> staged_mod_entries;
 std::vector<nlohmann::json> uninstalled_mod_entries;
 std::vector<nlohmann::json> installed_mod_entries;
 ImVec2 popup_modal_size(400, 200);
@@ -29,6 +30,8 @@ void FileDialog::draw_file_dialog()
             selected_profile_path = filePathName;
 
             game_selection_index = ModManager::get_game_selection(selected_profile_path);
+
+            staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
             uninstalled_mod_entries = ModManager::get_uninstalled_mod_entries(selected_profile_path);
             installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
         }
@@ -75,17 +78,18 @@ void REModman::draw_game_selector()
     }
 }
 
+int load_order = 0;
 void REModman::draw_mod_list()
 {
     if (!selected_profile_path.empty())
     {
-        if (!ImGui::CollapsingHeader("Mods"))
+        if (!ImGui::CollapsingHeader("Available Mods"))
         {
             return;
         }
 
-        ImGui::TreePush("Mods");
-        ImGui::BeginListBox("##ModsList", ImVec2(-1, 0));
+        ImGui::TreePush("AvailableMods");
+        ImGui::BeginListBox("##AvailableModsList", ImVec2(-1, 0));
 
         for (int i = 0; i < uninstalled_mod_entries.size(); i++)
         {
@@ -104,10 +108,12 @@ void REModman::draw_mod_list()
                     (ImGui::GetIO().DisplaySize.x / 2) - ImGui::GetContentRegionAvail().x / 2,
                     (ImGui::GetIO().DisplaySize.y / 2) - ImGui::GetContentRegionAvail().y / 2));
 
-                if (ImGui::Button("Install"))
+                ImGui::InputInt("Load Order", &load_order);
+                if (ImGui::Button("Add"))
                 {
-                    ModManager::install_mod(selected_profile_path, uninstalled_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/", selected_profile_path + "/Game/");
+                    ModManager::stage_mod(selected_profile_path, uninstalled_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/", selected_profile_path + "/Game/", load_order);
 
+                    staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
                     uninstalled_mod_entries = ModManager::get_uninstalled_mod_entries(selected_profile_path);
                     installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
                 }
@@ -122,6 +128,72 @@ void REModman::draw_mod_list()
 
         ImGui::EndListBox();
         ImGui::TreePop();
+    }
+}
+
+void REModman::draw_staging_mod_list()
+{
+    if (!selected_profile_path.empty())
+    {
+        if (!ImGui::CollapsingHeader("Staged Mods"))
+        {
+            return;
+        }
+
+        ImGui::TreePush("Staged Mods");
+        ImGui::BeginListBox("##StagedModsList", ImVec2(-1, 0));
+
+        for (int i = 0; i < staged_mod_entries.size(); i++)
+        {
+            std::filesystem::path sourcePath = staged_mod_entries[i]["SourcePath"];
+            std::string label = sourcePath.filename().string();
+
+            if (ImGui::Selectable(label.c_str()))
+            {
+                ImGui::OpenPopup(label.c_str());
+            }
+
+            if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
+            {
+                ImGui::SetWindowSize(popup_modal_size);
+                ImGui::SetWindowPos(ImVec2(
+                    (ImGui::GetIO().DisplaySize.x / 2) - ImGui::GetContentRegionAvail().x / 2,
+                    (ImGui::GetIO().DisplaySize.y / 2) - ImGui::GetContentRegionAvail().y / 2));
+
+                if (ImGui::Button("Remove"))
+                {
+                    staged_mod_entries = ModManager::remove_mod_from_list(staged_mod_entries, staged_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/");
+                    JsonUtils::write_json_to_file(selected_profile_path + "/" + "mods_staging.json", staged_mod_entries);
+
+                    staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
+                    uninstalled_mod_entries = ModManager::get_uninstalled_mod_entries(selected_profile_path);
+                    installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
+                }
+                ImGui::Separator();
+                if (ImGui::Button("Exit"))
+                {
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
+        }
+
+        ImGui::EndListBox();
+        ImGui::TreePop();
+    }
+}
+
+void REModman::draw_mod_deploy_button()
+{
+    if (!selected_profile_path.empty())
+    {
+        if (ImGui::Button("Deploy"))
+        {
+            for (int i = 0; i < staged_mod_entries.size(); i++)
+            {
+                ModManager::install_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/", selected_profile_path + "/Game/");
+            }
+        }
     }
 }
 
@@ -165,6 +237,7 @@ void REModman::draw_installed_mod_list()
                         ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/");
                     }
 
+                    staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
                     uninstalled_mod_entries = ModManager::get_uninstalled_mod_entries(selected_profile_path);
                     installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
                 }
