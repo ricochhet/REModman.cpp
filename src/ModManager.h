@@ -10,12 +10,6 @@
 #include <JsonUtils.h>
 #include <Utils.h>
 
-struct ModEntry
-{
-    std::string Name;
-    std::string Path;
-};
-
 namespace ModManager
 {
     std::vector<nlohmann::json> get_mod_entries(const std::string &path);

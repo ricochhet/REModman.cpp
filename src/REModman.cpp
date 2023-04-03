@@ -89,15 +89,17 @@ void REModman::draw_mod_list()
         ImGui::TreePush("Mods");
         ImGui::BeginListBox("##List", ImVec2(-1, 0));
 
-        for (int i = 0; i < uninstalled_mod_entries.size(); i++) {
+        for (int i = 0; i < uninstalled_mod_entries.size(); i++)
+        {
             std::filesystem::path sourcePath = uninstalled_mod_entries[i]["SourcePath"];
             std::string label = sourcePath.filename().string();
 
-            if (ImGui::Selectable(label.c_str())) {
+            if (ImGui::Selectable(label.c_str()))
+            {
                 ImGui::OpenPopup(label.c_str());
             }
 
-            if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove)) 
+            if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
             {
                 ImGui::SetWindowSize(popup_modal_size);
                 ImGui::SetWindowPos(popup_modal_pos);
@@ -135,15 +137,17 @@ void REModman::draw_installed_mod_list()
         ImGui::TreePush("Installed Mods");
         ImGui::BeginListBox("##List", ImVec2(-1, 0));
 
-        for (int i = 0; i < installed_mod_entries.size(); i++) {
+        for (int i = 0; i < installed_mod_entries.size(); i++)
+        {
             std::filesystem::path sourcePath = installed_mod_entries[i]["SourcePath"];
             std::string label = sourcePath.filename().string();
 
-            if (ImGui::Selectable(label.c_str())) {
+            if (ImGui::Selectable(label.c_str()))
+            {
                 ImGui::OpenPopup(label.c_str());
             }
 
-            if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove)) 
+            if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
             {
                 ImGui::SetWindowSize(popup_modal_size);
                 ImGui::SetWindowPos(popup_modal_pos);
