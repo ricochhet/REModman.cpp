@@ -22,14 +22,14 @@ std::vector<nlohmann::json> ModManager::get_mod_entries(const std::string &path)
     return modEntries;
 }
 
-std::vector<nlohmann::json> ModManager::get_uninstalled_mod_entries(const std::string &path)
+std::vector<nlohmann::json> ModManager::get_available_mod_entries(const std::string &path)
 {
     if (!std::filesystem::exists(path))
     {
         throw;
     }
 
-    nlohmann::json modInstallations = JsonUtils::load_json(path + "/mods.json");
+    nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_installed.json");
     std::vector<nlohmann::json> modEntries = get_mod_entries(path);
     std::vector<nlohmann::json> currentModEntries;
 
@@ -61,29 +61,7 @@ std::vector<nlohmann::json> ModManager::get_staged_mod_entries(const std::string
         throw;
     }
 
-    nlohmann::json modInstallations = JsonUtils::load_json(path + "/mods_staging.json");
-    std::vector<nlohmann::json> modEntries = get_mod_entries(path);
-    std::vector<nlohmann::json> currentModEntries;
-
-    for (auto &entry : modEntries)
-    {
-        bool found = false;
-        for (auto &installedMod : modInstallations)
-        {
-            if (installedMod["SourcePath"] == entry["SourcePath"])
-            {
-                found = true;
-                break;
-            }
-        }
-
-        if (found)
-        {
-            currentModEntries.push_back(entry);
-        }
-    }
-
-    return currentModEntries;
+    return JsonUtils::load_json(path + "/mods_staging.json");
 }
 
 std::vector<nlohmann::json> ModManager::get_installed_mod_entries(const std::string &path)
@@ -93,7 +71,7 @@ std::vector<nlohmann::json> ModManager::get_installed_mod_entries(const std::str
         throw;
     }
 
-    nlohmann::json modInstallations = JsonUtils::load_json(path + "/mods.json");
+    nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_installed.json");
     std::vector<nlohmann::json> modInstallationEntries;
 
     for (auto &installedMod : modInstallations)
@@ -137,28 +115,7 @@ bool ModManager::stage_mod(const std::string &path, const std::string &modPath, 
         return false;
     }
 
-    nlohmann::json j = JsonUtils::load_json(path + "/profile.json");
-    std::string pakModPrefix = "re_chunk_000.pak.patch_";
-    std::string pakModSuffix = ".pak";
     nlohmann::json modFiles;
-    int pakModIndex = j["PatchReEnginePakIndex"];
-    bool isPakMod = false;
-
-    for (const auto &fileEntry : std::filesystem::directory_iterator(modPath))
-    {
-        if (fileEntry.is_regular_file())
-        {
-            std::string fileName = fileEntry.path().filename().string();
-
-            if (fileName.substr(fileName.find_last_of(".") + 1) == "pak")
-            {
-                isPakMod = true;
-                pakModIndex++;
-                JsonUtils::create_or_update_json(path + "/profile.json", "PatchReEnginePakIndex", pakModIndex, true);
-                break;
-            }
-        }
-    }
 
     for (const auto &fileEntry : std::filesystem::recursive_directory_iterator(modPath))
     {
@@ -166,13 +123,6 @@ bool ModManager::stage_mod(const std::string &path, const std::string &modPath, 
         {
             std::string relative_path = std::filesystem::relative(fileEntry.path(), modPath).string();
             std::string filename = fileEntry.path().filename().string();
-
-            if (isPakMod)
-            {
-                std::string pakFileName = pakModPrefix + std::to_string(pakModIndex).insert(0, 3 - std::to_string(pakModIndex).length(), '0') + pakModSuffix;
-                relative_path = Utils::string_replace_all(relative_path, filename, pakFileName);
-            }
-
             std::string game_file = gamePath + "/" + relative_path;
             modFiles[fileEntry.path().string()] = game_file;
         }
@@ -195,6 +145,13 @@ bool ModManager::stage_mod(const std::string &path, const std::string &modPath, 
     JsonUtils::write_json_to_file(path + "/" + "mods_staging.json", modInstallations);
 
     return true;
+}
+
+bool ModManager::destage_mod(const std::string &path, const std::string &modPath, const std::string &modInstallPath)
+{
+    std::vector<nlohmann::json> j = JsonUtils::load_json(path + "/" + "mods_staging.json");
+    j = ModManager::remove_mod_from_list(j, modPath, modInstallPath);
+    JsonUtils::write_json_to_file(path + "/" + "mods_staging.json", j);
 }
 
 bool ModManager::install_mod(const std::string &path, const std::string &modPath, const std::string &gamePath, const std::string &modInstallPath)
@@ -256,9 +213,9 @@ bool ModManager::install_mod(const std::string &path, const std::string &modPath
     installedMod["InstallPath"] = modInstallPath;
     installedMod["Files"] = modFiles;
 
-    nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods.json");
+    nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_installed.json");
     modInstallations.push_back(installedMod);
-    JsonUtils::write_json_to_file(path + "/" + "mods.json", modInstallations);
+    JsonUtils::write_json_to_file(path + "/" + "mods_installed.json", modInstallations);
 
     return true;
 }
@@ -271,7 +228,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
     }
 
     nlohmann::json modInstallations;
-    std::ifstream fileIn(path + "/" + "mods.json");
+    std::ifstream fileIn(path + "/" + "mods_installed.json");
     if (fileIn.is_open())
     {
         fileIn >> modInstallations;
@@ -279,7 +236,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
     }
     else
     {
-        throw std::runtime_error("Failed to open mods.json.");
+        throw std::runtime_error("Failed to open mods_installed.json.");
     }
 
     for (const auto &installedMod : modInstallations)
@@ -296,7 +253,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
 
             modInstallations.erase(std::remove(modInstallations.begin(), modInstallations.end(), installedMod), modInstallations.end());
 
-            std::ofstream fileOut(path + "/" + "mods.json");
+            std::ofstream fileOut(path + "/" + "mods_installed.json");
             if (fileOut.is_open())
             {
                 fileOut << modInstallations.dump(4);
@@ -304,7 +261,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
             }
             else
             {
-                throw std::runtime_error("Failed to open mods.json.");
+                throw std::runtime_error("Failed to open mods_installed.json.");
             }
 
             return true;
@@ -321,7 +278,7 @@ bool ModManager::uninstall_pak_mod(const std::string &path, const std::string &m
         return false;
     }
 
-    nlohmann::json modInstallations = JsonUtils::load_json(path + "/mods.json");
+    nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_installed.json");
     std::vector<nlohmann::json> pakModInstallations;
 
     for (auto &installedMod : modInstallations)
@@ -344,15 +301,15 @@ bool ModManager::uninstall_pak_mod(const std::string &path, const std::string &m
 
     for (auto &installedPakMod : pakModInstallations)
     {
-        ModManager::uninstall_mod(path, installedPakMod["SourcePath"], path + "/Game/");
+        ModManager::uninstall_mod(path, installedPakMod["SourcePath"], modInstallPath);
     }
 
-    std::vector<nlohmann::json> pakModsToReinstall = ModManager::remove_mod_from_list(pakModInstallations, modPath, path + "/Game/");
+    std::vector<nlohmann::json> pakModsToReinstall = ModManager::remove_mod_from_list(pakModInstallations, modPath, modInstallPath);
     JsonUtils::create_or_update_json(path + "/profile.json", "PatchReEnginePakIndex", 2, true);
 
     for (auto &modToReinstall : pakModsToReinstall)
     {
-        ModManager::install_mod(path, modToReinstall["SourcePath"], path + "/Game/", path + "/Game/");
+        ModManager::install_mod(path, modToReinstall["SourcePath"], modInstallPath, modInstallPath);
     }
 
     return true;
@@ -370,6 +327,30 @@ std::vector<nlohmann::json> ModManager::remove_mod_from_list(const std::vector<n
     for (auto it = modInstallations.begin(); it != modInstallations.end();)
     {
         if ((*it)["SourcePath"] == modPath && (*it)["InstallPath"] == modInstallPath)
+        {
+            it = modInstallations.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    return modInstallations;
+}
+
+std::vector<nlohmann::json> ModManager::remove_mod_from_entries(const std::vector<nlohmann::json> &listToPatch, const std::string &modPath)
+{
+    if (!std::filesystem::exists(modPath))
+    {
+        throw;
+    }
+
+    std::vector<nlohmann::json> modInstallations = listToPatch;
+
+    for (auto it = modInstallations.begin(); it != modInstallations.end();)
+    {
+        if ((*it)["SourcePath"] == modPath)
         {
             it = modInstallations.erase(it);
         }
