@@ -1,21 +1,20 @@
 #include <ModManager.h>
 
-std::vector<ModEntry> ModManager::get_mod_entries(const std::string &path)
+std::vector<nlohmann::json> ModManager::get_mod_entries(const std::string &path)
 {
     if (!std::filesystem::exists(path))
     {
         throw;
     }
 
-    std::vector<ModEntry> modEntries;
+    std::vector<nlohmann::json> modEntries;
 
     for (const auto &fileEntry : std::filesystem::directory_iterator(path + "/Mods/"))
     {
         if (fileEntry.is_directory())
         {
-            ModEntry modEntry;
-            modEntry.Name = fileEntry.path().filename().string();
-            modEntry.Path = fileEntry.path().string();
+            nlohmann::json modEntry;
+            modEntry["SourcePath"] = fileEntry.path().string();
             modEntries.push_back(modEntry);
         }
     }
@@ -23,7 +22,7 @@ std::vector<ModEntry> ModManager::get_mod_entries(const std::string &path)
     return modEntries;
 }
 
-std::vector<ModEntry> ModManager::get_uninstalled_mod_entries(const std::string &path)
+std::vector<nlohmann::json> ModManager::get_uninstalled_mod_entries(const std::string &path)
 {
     if (!std::filesystem::exists(path))
     {
@@ -31,15 +30,15 @@ std::vector<ModEntry> ModManager::get_uninstalled_mod_entries(const std::string 
     }
 
     nlohmann::json modInstallations = JsonUtils::load_json(path + "/mods.json");
-    std::vector<ModEntry> modEntries = get_mod_entries(path);
-    std::vector<ModEntry> currentModEntries;
+    std::vector<nlohmann::json> modEntries = get_mod_entries(path);
+    std::vector<nlohmann::json> currentModEntries;
 
     for (auto& entry : modEntries)
     {
         bool found = false;
         for (auto& installedMod : modInstallations)
         {
-            if (installedMod["SourcePath"] == entry.Path)
+            if (installedMod["SourcePath"] == entry["SourcePath"])
             {
                 found = true;
                 break;
@@ -216,7 +215,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
     throw std::runtime_error("Mod installation not found.");
 }
 
-bool ModManager::uninstall_pak_mod(const ModEntry &modEntry, const std::string &path, const std::string &modPath, const std::string &modInstallPath)
+bool ModManager::uninstall_pak_mod(const std::string &path, const std::string &modPath, const std::string &modInstallPath)
 {
     if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath))
     {
@@ -249,7 +248,7 @@ bool ModManager::uninstall_pak_mod(const ModEntry &modEntry, const std::string &
         ModManager::uninstall_mod(path, installedPakMod["SourcePath"], path + "/Game/");
     }
 
-    std::vector<nlohmann::json> pakModsToReinstall = ModManager::remove_mod_from_list(pakModInstallations, modEntry.Path, path + "/Game/");
+    std::vector<nlohmann::json> pakModsToReinstall = ModManager::remove_mod_from_list(pakModInstallations, modPath, path + "/Game/");
     JsonUtils::create_or_update_json(path + "/profile.json", "PatchReEnginePakIndex", 2, true);
 
     for (auto &modToReinstall : pakModsToReinstall)
