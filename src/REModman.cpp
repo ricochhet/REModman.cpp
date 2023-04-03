@@ -76,7 +76,7 @@ void REModman::draw_game_selector()
         }
     }
 }
-int selected_item = -1;
+
 void REModman::draw_mod_list()
 {
     if (!selected_profile_path.empty())
@@ -87,14 +87,13 @@ void REModman::draw_mod_list()
         }
 
         ImGui::TreePush("Mods");
+        ImGui::BeginListBox("##List", ImVec2(-1, 0));
 
-        ImGui::ListBoxHeader("##List", uninstalled_mod_entries.size(), 4);
         for (int i = 0; i < uninstalled_mod_entries.size(); i++) {
             std::filesystem::path sourcePath = uninstalled_mod_entries[i]["SourcePath"];
             std::string label = sourcePath.filename().string();
 
-            if (ImGui::Selectable(label.c_str(), selected_item == i)) {
-                selected_item = i;
+            if (ImGui::Selectable(label.c_str())) {
                 ImGui::OpenPopup(label.c_str());
             }
 
@@ -118,47 +117,14 @@ void REModman::draw_mod_list()
                 ImGui::EndPopup();
             }
         }
-        ImGui::ListBoxFooter();
 
-        /*for (auto &it : uninstalled_mod_entries)
-        {
-            std::filesystem::path sourcePath = it["SourcePath"];
-            std::string label = sourcePath.filename().string();
-
-            if (ImGui::Button(label.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0)))
-            {
-                ImGui::OpenPopup(label.c_str());
-            }
-
-            if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize))
-            {
-                ImGui::SetWindowSize(popup_modal_size);
-                ImGui::SetWindowPos(popup_modal_pos);
-
-                if (ImGui::Button("Install"))
-                {
-                    ModManager::install_mod(selected_profile_path, it["SourcePath"], selected_profile_path + "/Game/", selected_profile_path + "/Game/");
-
-                    uninstalled_mod_entries = ModManager::get_uninstalled_mod_entries(selected_profile_path);
-                    installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
-                }
-            
-                ImGui::Separator();
-                if (ImGui::Button("Exit"))
-                {
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::EndPopup();
-            }
-        }*/
-
+        ImGui::EndListBox();
         ImGui::TreePop();
     }
 }
 
 void REModman::draw_installed_mod_list()
 {
-    ImGui::Separator();
     if (!selected_profile_path.empty())
     {
         if (!ImGui::CollapsingHeader("Installed Mods"))
@@ -167,38 +133,45 @@ void REModman::draw_installed_mod_list()
         }
 
         ImGui::TreePush("Installed Mods");
+        ImGui::BeginListBox("##List", ImVec2(-1, 0));
 
-        for (auto &it : installed_mod_entries)
-        {
-            std::filesystem::path sourcePath = it["SourcePath"];
+        for (int i = 0; i < installed_mod_entries.size(); i++) {
+            std::filesystem::path sourcePath = installed_mod_entries[i]["SourcePath"];
+            std::string label = sourcePath.filename().string();
 
-            if (ImGui::Button(sourcePath.filename().string().c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0)))
-            {
-                ImGui::OpenPopup(sourcePath.filename().string().c_str());
+            if (ImGui::Selectable(label.c_str())) {
+                ImGui::OpenPopup(label.c_str());
             }
 
-            if (ImGui::BeginPopupModal(sourcePath.filename().string().c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize))
+            if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove)) 
             {
                 ImGui::SetWindowSize(popup_modal_size);
                 ImGui::SetWindowPos(popup_modal_pos);
 
                 if (ImGui::Button("Uninstall"))
                 {
-                    if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(it["SourcePath"]))
+                    if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]["SourcePath"]))
                     {
-                        ModManager::uninstall_pak_mod(selected_profile_path, it["SourcePath"], selected_profile_path + "/Game/");
+                        ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/");
                     }
                     else
                     {
-                        ModManager::uninstall_mod(selected_profile_path, it["SourcePath"], selected_profile_path + "/Game/");
+                        ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_profile_path + "/Game/");
                     }
 
                     uninstalled_mod_entries = ModManager::get_uninstalled_mod_entries(selected_profile_path);
                     installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
                 }
+                ImGui::Separator();
+                if (ImGui::Button("Exit"))
+                {
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
             }
         }
 
+        ImGui::EndListBox();
         ImGui::TreePop();
     }
 }
