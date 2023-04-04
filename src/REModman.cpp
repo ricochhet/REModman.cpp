@@ -35,12 +35,14 @@ void FileDialog::draw_load_profile_dialog()
             ModManager::init_checks(selected_profile_path + "/" + "profile.json");
             ModManager::init_checks(selected_profile_path + "/" + "mods_staging.json");
             ModManager::init_checks(selected_profile_path + "/" + "mods_installed.json");
+            if (JsonUtils::get_string_value(selected_profile_path + "/" + "profile.json", "LastSelectedGame") != "")
+            {
+                game_selection_index = ModManager::get_game_selection(selected_profile_path);
+            }
 
-            game_selection_index = ModManager::get_game_selection(selected_profile_path);
             staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
             available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
             installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
-
             Logger::getInstance().log("Found profile path: " + filePathName, LogLevel::Info);
 
             if (JsonUtils::get_string_value(selected_profile_path + "/" + "profile.json", GameSelection[game_selection_index] + "GamePath") != "")

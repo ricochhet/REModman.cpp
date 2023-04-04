@@ -47,7 +47,7 @@ std::string JsonUtils::get_string_value(const std::string &path, const std::stri
     }
     else
     {
-        Logger::getInstance().log("Key not found in JSON file at path: " + path, LogLevel::Error);
+        Logger::getInstance().log("Key not found in JSON file at path: " + path, LogLevel::Warning);
         return "";
     }
 }
@@ -62,7 +62,7 @@ int JsonUtils::get_integer_value(const std::string &path, const std::string &key
     }
     else
     {
-        Logger::getInstance().log("Key not found in JSON file at path: " + path, LogLevel::Error);
+        Logger::getInstance().log("Key not found in JSON file at path: " + path, LogLevel::Warning);
         return 0;
     }
 }

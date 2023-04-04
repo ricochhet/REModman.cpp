@@ -2,13 +2,13 @@
 
 void ModManager::init_checks(const std::string &path)
 {
-    std::ifstream file_check(path);
+    std::ifstream fileIn(path);
 
-    if (!file_check.good()) {
-        std::ofstream file_create(path);
-        nlohmann::json empty_array = nlohmann::json::array();
-        file_create << empty_array;
-        file_create.close();
+    if (!fileIn.good()) {
+        std::ofstream fileOut(path);
+        nlohmann::json emptyArray = nlohmann::json::array();
+        fileOut << emptyArray;
+        fileOut.close();
     }
 }
 
