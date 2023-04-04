@@ -28,4 +28,4 @@ namespace REModman
     void draw_installed_mod_list();
 }
 
-#endif REMODMAN_INCLUDED
+#endif // REMODMAN_INCLUDED

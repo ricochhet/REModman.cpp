@@ -11,4 +11,4 @@ namespace Utils
     bool create_directory(const std::filesystem::path &path);
 }
 
-#endif REMODMAN_UTILS_INCLUDED
+#endif // REMODMAN_UTILS_INCLUDED

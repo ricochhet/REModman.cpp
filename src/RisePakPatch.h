@@ -70,4 +70,4 @@ namespace RisePakPatch
     void ProcessDirectory(const std::string &path, const std::string &outputFile);
 }
 
-#endif REMODMAN_RISEPAKPATCH_INCLUDED
+#endif // REMODMAN_RISEPAKPATCH_INCLUDED

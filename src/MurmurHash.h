@@ -8,4 +8,4 @@
 
 uint32_t murmurhash3(const char* key, const uint32_t seed);
 
-#endif REMODMAN_MURMURHASH_INCLUDED
+#endif // REMODMAN_MURMURHASH_INCLUDED

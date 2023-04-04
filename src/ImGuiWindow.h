@@ -10,7 +10,7 @@
 #include <backends/imgui_impl_opengl3.h>
 
 #include <JsonUtils.h>
-#include <murmurhash.h>
+#include <MurmurHash.h>
 #include <font_robotomedium.h>
 #include <REModman.h>
 
@@ -22,4 +22,4 @@ namespace ImGuiWindow
     void setup_imgui_window();
 }
 
-#endif REMODMAN_IMGUIWINDOW_INCLUDED
+#endif // REMODMAN_IMGUIWINDOW_INCLUDED

@@ -76,7 +76,7 @@ void REModman::draw_load_profile()
     {
         ImGui::SameLine();
         std::string label = "Loaded profile: " + selected_profile_path;
-        ImGui::Text(label.c_str());
+        ImGui::Text("%s", label.c_str());
     }
 }
 
@@ -90,7 +90,7 @@ void REModman::draw_get_game_path()
         {
             ImGui::SameLine();
             std::string label = "Game Folder: " + selected_game_path;
-            ImGui::Text(label.c_str());
+            ImGui::Text("%s", label.c_str());
         }
     }
 }
@@ -107,7 +107,7 @@ void REModman::draw_game_selector()
                 if (ImGui::Selectable(GameSelection[i].c_str(), isSelected))
                 {
                     game_selection_index = i;
-                    JsonUtils::create_or_update_json(selected_profile_path + "/profile.json", "LastSelectedGame", i, true);
+                    JsonUtils::create_or_update_json(selected_profile_path + "/" + "profile.json", "LastSelectedGame", i, true);
                 }
 
                 if (isSelected)

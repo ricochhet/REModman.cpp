@@ -19,4 +19,4 @@ namespace JsonUtils
     void create_or_update_json(const std::string& path, const std::string& key, const std::variant<std::string, int>& value, bool update);
 }
 
-#endif REMODMAN_JSONUTILS_INCLUDED
+#endif // REMODMAN_JSONUTILS_INCLUDED

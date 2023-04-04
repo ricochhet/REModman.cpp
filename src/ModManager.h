@@ -29,4 +29,4 @@ namespace ModManager
     std::string get_game_path(const std::string &path, const std::string &selection);
 }
 
-#endif REMODMAN_MANAGER_INCLUDED
+#endif // REMODMAN_MANAGER_INCLUDED

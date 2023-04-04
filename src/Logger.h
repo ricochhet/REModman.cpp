@@ -31,4 +31,4 @@ private:
     LogLevel m_logLevel;
 };
 
-#endif REMODMAN_LOGGER_INCLUDED
+#endif // REMODMAN_LOGGER_INCLUDED
