@@ -5,3 +5,5 @@
 /build/
 /TestPaks/
 /build_ninja/
+/ninja_build_release/
+/ninja_build_debug/
