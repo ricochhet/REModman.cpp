@@ -71,12 +71,13 @@ std::vector<std::string> ModManager::get_staged_mod_entries(const std::string &p
         throw;
     }
 
-    nlohmann::json stagedMods = JsonUtils::load_json(path + "/mods_staging.json");
+    std::vector<ModManagerData::Mod> stagedMods = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/mods_staging.json"));
+    // nlohmann::json stagedMods = JsonUtils::load_json(path + "/mods_staging.json");
     std::vector<std::string> stagedModEntries;
 
     for (auto &entry : stagedMods)
     {
-        stagedModEntries.push_back(entry["SourcePath"]);
+        stagedModEntries.push_back(entry.SourcePath);
     }
 
     return stagedModEntries;
@@ -176,36 +177,17 @@ bool ModManager::destage_mod(const std::string &path, const std::string &modPath
     return true;
 }
 
-bool ModManager::install_mod(const std::string &path, const std::string &modPath, const std::string &gamePath)
+bool ModManager::install_mod(const std::string &path, const std::string &modPath, const std::string &gamePath, const std::string &gameSelection)
 {
     if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath) || !std::filesystem::exists(gamePath))
     {
         return false;
     }
 
-    nlohmann::json j = JsonUtils::load_json(path + "/profile.json");
-    std::string pakModPrefix = "re_chunk_000.pak.patch_";
-    std::string pakModSuffix = ".pak";
+    ModManagerPatches::MonsterHunterRise::PatchReEnginePak mhrPatchReEnginePak =
+        ModManagerPatches::MonsterHunterRise::patch_re_engine_pak(path, modPath);
+
     nlohmann::json modFiles;
-    int pakModIndex = j["PatchReEnginePakIndex"];
-    bool isPakMod = false;
-
-    for (const auto &fileEntry : std::filesystem::directory_iterator(modPath))
-    {
-        if (fileEntry.is_regular_file())
-        {
-            std::string fileName = fileEntry.path().filename().string();
-
-            if (fileName.substr(fileName.find_last_of(".") + 1) == "pak")
-            {
-                isPakMod = true;
-                pakModIndex++;
-                JsonUtils::create_or_update_json(path + "/profile.json", "PatchReEnginePakIndex", pakModIndex, true);
-                break;
-            }
-        }
-    }
-
     for (const auto &fileEntry : std::filesystem::recursive_directory_iterator(modPath))
     {
         if (fileEntry.is_regular_file())
@@ -213,9 +195,10 @@ bool ModManager::install_mod(const std::string &path, const std::string &modPath
             std::string relative_path = std::filesystem::relative(fileEntry.path(), modPath).string();
             std::string filename = fileEntry.path().filename().string();
 
-            if (isPakMod)
+            if (mhrPatchReEnginePak.isPak && gameSelection == "MonsterHunterRise")
             {
-                std::string pakFileName = pakModPrefix + std::to_string(pakModIndex).insert(0, 3 - std::to_string(pakModIndex).length(), '0') + pakModSuffix;
+                std::string pakFileName =
+                    "re_chunk_000.pak.patch_" + std::to_string(mhrPatchReEnginePak.pakIndex).insert(0, 3 - std::to_string(mhrPatchReEnginePak.pakIndex).length(), '0') + ".pak";
                 relative_path = Utils::string_replace_all(relative_path, filename, pakFileName);
             }
 
@@ -295,7 +278,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
     throw std::runtime_error("Mod installation not found.");
 }
 
-bool ModManager::uninstall_pak_mod(const std::string &path, const std::string &modPath, const std::string &gamePath)
+bool ModManager::uninstall_pak_mod(const std::string &path, const std::string &modPath, const std::string &gamePath, const std::string &gameSelection)
 {
     if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath))
     {
@@ -329,11 +312,11 @@ bool ModManager::uninstall_pak_mod(const std::string &path, const std::string &m
     }
 
     std::vector<nlohmann::json> pakModsToReinstall = ModManager::remove_mod_from_list(pakModInstallations, modPath);
-    JsonUtils::create_or_update_json(path + "/profile.json", "PatchReEnginePakIndex", 2, true);
+    JsonUtils::create_or_update_json(path + "/profile.json", {"Patches", "MonsterHunterRise", "PatchReEnginePakIndex"}, 2, true);
 
     for (auto &modToReinstall : pakModsToReinstall)
     {
-        ModManager::install_mod(path, modToReinstall["SourcePath"], gamePath);
+        ModManager::install_mod(path, modToReinstall["SourcePath"], gamePath, gameSelection);
     }
 
     return true;
@@ -364,16 +347,44 @@ std::vector<nlohmann::json> ModManager::remove_mod_from_list(const std::vector<n
     return modInstallations;
 }
 
+ModManagerPatches::MonsterHunterRise::PatchReEnginePak ModManagerPatches::MonsterHunterRise::patch_re_engine_pak(const std::string &path, const std::string &modPath)
+{
+    nlohmann::json j = JsonUtils::load_json(path + "/profile.json");
+    int pakModIndex = j["Patches"]["MonsterHunterRise"]["PatchReEnginePakIndex"];
+    bool isPakMod = false;
+
+    for (const auto &fileEntry : std::filesystem::directory_iterator(modPath))
+    {
+        if (fileEntry.is_regular_file())
+        {
+            std::string fileName = fileEntry.path().filename().string();
+
+            if (fileName.substr(fileName.find_last_of(".") + 1) == "pak")
+            {
+                isPakMod = true;
+                pakModIndex++;
+                JsonUtils::create_or_update_json(path + "/profile.json", {"Patches", "MonsterHunterRise", "PatchReEnginePakIndex"}, pakModIndex, true);
+                break;
+            }
+        }
+    }
+
+    ModManagerPatches::MonsterHunterRise::PatchReEnginePak pakInfo;
+    pakInfo.isPak = isPakMod;
+    pakInfo.pakIndex = pakModIndex;
+    return pakInfo;
+}
+
 int ModManager::get_last_selected_game(const std::string &path)
 {
-    int lastSelectedGameIndex = JsonUtils::get_integer_value(path + "/" + "profile.json", "LastSelectedGame");
+    int lastSelectedGameIndex = JsonUtils::get_integer_value(path + "/" + "profile.json", {"LastSelectedGame"});
     Logger::getInstance().log("Found profile path: " + path, LogLevel::Info);
     return lastSelectedGameIndex;
 }
 
 std::string ModManager::get_game_path(const std::string &path, const std::string &selection)
 {
-    std::string gamePath = JsonUtils::get_string_value(path + "/" + "profile.json", selection + "GamePath");
+    std::string gamePath = JsonUtils::get_string_value(path + "/" + "profile.json", {"Games", selection + "GamePath"});
 
     if (!gamePath.empty())
     {

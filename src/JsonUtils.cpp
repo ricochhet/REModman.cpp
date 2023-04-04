@@ -41,7 +41,8 @@ void JsonUtils::write_empty_json_to_file(const std::string &path)
 {
     std::ifstream fileIn(path);
 
-    if (!fileIn.good()) {
+    if (!fileIn.good())
+    {
         std::ofstream fileOut(path);
         nlohmann::json emptyArray = nlohmann::json::array();
         fileOut << emptyArray;
@@ -49,37 +50,83 @@ void JsonUtils::write_empty_json_to_file(const std::string &path)
     }
 }
 
-std::string JsonUtils::get_string_value(const std::string &path, const std::string &key)
+std::string JsonUtils::get_string_value(const std::string &path, const std::vector<std::string> &keys)
 {
-    nlohmann::json j = load_json(path);
+    nlohmann::json obj = load_json(path);
+    for (const auto &key : keys)
+    {
+        if (obj.contains(key))
+        {
+            obj = obj[key];
+        }
+        else
+        {
+            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            return std::string();
+        }
+    }
 
-    if (j.contains(key))
-    {
-        return j[key].get<std::string>();
-    }
-    else
-    {
-        Logger::getInstance().log("Key not found in JSON file at path: " + path, LogLevel::Warning);
-        return std::string();
-    }
+    return obj.get<std::string>();
 }
 
-int JsonUtils::get_integer_value(const std::string &path, const std::string &key)
+std::string JsonUtils::get_string_value(const nlohmann::json &j, const std::vector<std::string> &keys)
 {
-    nlohmann::json j = load_json(path);
+    nlohmann::json obj = j;
+    for (const auto &key : keys)
+    {
+        if (obj.contains(key))
+        {
+            obj = obj[key];
+        }
+        else
+        {
+            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            return std::string();
+        }
+    }
 
-    if (j.contains(key))
-    {
-        return j[key].get<int>();
-    }
-    else
-    {
-        Logger::getInstance().log("Key not found in JSON file at path: " + path, LogLevel::Warning);
-        return 0;
-    }
+    return obj.get<std::string>();
 }
 
-void JsonUtils::create_or_update_json(const std::string &path, const std::string &key, const std::variant<std::string, int> &value, bool update)
+int JsonUtils::get_integer_value(const std::string &path, const std::vector<std::string> &keys)
+{
+    nlohmann::json obj = load_json(path);
+    for (const auto &key : keys)
+    {
+        if (obj.contains(key))
+        {
+            obj = obj[key];
+        }
+        else
+        {
+            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            return 0;
+        }
+    }
+
+    return obj.get<int>();
+}
+
+int JsonUtils::get_integer_value(const nlohmann::json &j, const std::vector<std::string> &keys)
+{
+    nlohmann::json obj = j;
+    for (const auto &key : keys)
+    {
+        if (obj.contains(key))
+        {
+            obj = obj[key];
+        }
+        else
+        {
+            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            return 0;
+        }
+    }
+
+    return obj.get<int>();
+}
+
+void JsonUtils::create_or_update_json(const std::string &path, const std::vector<std::string> &keys, const std::variant<std::string, int> &value, bool update)
 {
     std::ifstream fileIn(path);
 
@@ -88,53 +135,86 @@ void JsonUtils::create_or_update_json(const std::string &path, const std::string
         nlohmann::json j;
         fileIn >> j;
 
-        auto it = j.find(key);
-        if (it == j.end())
+        nlohmann::json *current = &j;
+        for (const auto &key : keys)
         {
-            if (std::holds_alternative<std::string>(value))
+            auto it = current->find(key);
+            if (it == current->end())
             {
-                j[key] = std::get<std::string>(value);
-            }
-            else if (std::holds_alternative<int>(value))
-            {
-                j[key] = std::get<int>(value);
-            }
-
-            std::ofstream fileOut(path);
-            fileOut << j.dump(4) << std::endl;
-        }
-        else
-        {
-            if (update)
-            {
-                Logger::getInstance().log("Updating " + key + " in JSON", LogLevel::Info);
-                if (std::holds_alternative<std::string>(value))
+                if (key == keys.back())
                 {
-                    *it = std::get<std::string>(value);
-                }
-                else if (std::holds_alternative<int>(value))
-                {
-                    *it = std::get<int>(value);
-                }
+                    if (std::holds_alternative<std::string>(value))
+                    {
+                        (*current)[key] = std::get<std::string>(value);
+                    }
+                    else if (std::holds_alternative<int>(value))
+                    {
+                        (*current)[key] = std::get<int>(value);
+                    }
 
-                std::ofstream fileOut(path);
-                fileOut << j.dump(4) << std::endl;
+                    std::ofstream fileOut(path);
+                    fileOut << j.dump(4) << std::endl;
+                }
+                else
+                {
+                    nlohmann::json newObject;
+                    (*current)[key] = newObject;
+                    current = &(*current)[key];
+                }
+            }
+            else
+            {
+                if (key == keys.back())
+                {
+                    if (update)
+                    {
+                        Logger::getInstance().log("Updating " + key + " in JSON", LogLevel::Info);
+                        if (std::holds_alternative<std::string>(value))
+                        {
+                            *it = std::get<std::string>(value);
+                        }
+                        else if (std::holds_alternative<int>(value))
+                        {
+                            *it = std::get<int>(value);
+                        }
+
+                        std::ofstream fileOut(path);
+                        fileOut << j.dump(4) << std::endl;
+                    }
+                }
+                else
+                {
+                    current = &(*it);
+                }
             }
         }
     }
     else
     {
         nlohmann::json j;
-        if (std::holds_alternative<std::string>(value))
+        nlohmann::json *current = &j;
+        for (const auto &key : keys)
         {
-            j[key] = std::get<std::string>(value);
-        }
-        else if (std::holds_alternative<int>(value))
-        {
-            j[key] = std::get<int>(value);
-        }
+            if (key == keys.back())
+            {
+                if (std::holds_alternative<std::string>(value))
+                {
+                    (*current)[key] = std::get<std::string>(value);
+                }
+                else if (std::holds_alternative<int>(value))
+                {
+                    (*current)[key] = std::get<int>(value);
+                }
 
-        std::ofstream fileOut(path);
-        fileOut << j.dump(4) << std::endl;
+                std::ofstream fileOut(path);
+                fileOut << j.dump(4) << std::endl;
+            }
+            else
+            {
+                nlohmann::json newObject;
+                (*current)[key] = newObject;
+                current = &(*current)[key];
+            }
+        }
     }
 }

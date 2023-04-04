@@ -31,8 +31,10 @@ void FileDialog::draw_load_profile_dialog()
         if (ImGuiFileDialog::Instance()->IsOk())
         {
             std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            JsonUtils::create_or_update_json(filePathName + "/" + "profile.json", "SelectedProfile", filePathName, true);
-            JsonUtils::create_or_update_json(filePathName + "/" + "profile.json", "PatchReEnginePakIndex", 2, false);
+            JsonUtils::create_or_update_json(filePathName + "/" + "profile.json", {"SelectedProfile"}, filePathName, true);
+            JsonUtils::create_or_update_json(filePathName + "/" + "profile.json", {"Patches", "MonsterHunterRise"
+                                                                                              "PatchReEnginePakIndex"},
+                                             2, false);
             selected_profile_path = filePathName;
 
             ModManager::startup_health_checks(selected_profile_path);
@@ -74,8 +76,14 @@ void FileDialog::draw_get_game_path_dialog()
         if (ImGuiFileDialog::Instance()->IsOk())
         {
             std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            JsonUtils::create_or_update_json(selected_profile_path + "/" + "profile.json", GameSelection[game_selection_index] + "GamePath", filePathName, true);
+            JsonUtils::create_or_update_json(selected_profile_path + "/" + "profile.json", {"Games", GameSelection[game_selection_index] + "GamePath"}, filePathName, true);
             selected_game_path = filePathName;
+
+            if (!selected_game_path.empty())
+            {
+                getGameDlgBtnLabel = "(Game Location) " + Utils::truncate_string(selected_game_path, 256);
+                selected_game_path = ModManager::get_game_path(selected_profile_path, GameSelection[game_selection_index]);
+            }
 
             Logger::getInstance().log("Found existing game path: " + selected_game_path, LogLevel::Info);
         }
@@ -111,7 +119,18 @@ void REModman::draw_game_selector()
                 if (ImGui::Selectable(GameSelection[i].c_str(), isSelected))
                 {
                     game_selection_index = i;
-                    JsonUtils::create_or_update_json(selected_profile_path + "/" + "profile.json", "LastSelectedGame", i, true);
+                    JsonUtils::create_or_update_json(selected_profile_path + "/" + "profile.json", {"LastSelectedGame"}, i, true);
+
+                    if (ModManager::get_game_path(selected_profile_path, GameSelection[game_selection_index]).empty())
+                    {
+                        selected_game_path = std::string();
+                        getGameDlgBtnLabel = "Find Game Location For " + GameSelection[game_selection_index];
+                    }
+                    else
+                    {
+                        selected_game_path = ModManager::get_game_path(selected_profile_path, GameSelection[game_selection_index]);
+                        getGameDlgBtnLabel = "(Game Location) " + Utils::truncate_string(selected_game_path, 256);
+                    }
                 }
 
                 if (isSelected)
@@ -128,7 +147,7 @@ void REModman::draw_game_selector()
 int load_order = 0;
 void REModman::draw_mod_list()
 {
-    if (!selected_profile_path.empty())
+    if (!selected_profile_path.empty() && !selected_game_path.empty())
     {
         if (!ImGui::CollapsingHeader("Available Mods", ImGuiTreeNodeFlags_DefaultOpen))
         {
@@ -200,7 +219,7 @@ void REModman::draw_mod_list()
 
 void REModman::draw_staging_mod_list()
 {
-    if (!selected_profile_path.empty())
+    if (!selected_profile_path.empty() && !selected_game_path.empty())
     {
         if (!ImGui::CollapsingHeader("Staged Mods", ImGuiTreeNodeFlags_DefaultOpen))
         {
@@ -254,7 +273,7 @@ void REModman::draw_staging_mod_list()
 
 void REModman::draw_mod_deploy_button()
 {
-    if (!selected_profile_path.empty())
+    if (!selected_profile_path.empty() && !selected_game_path.empty())
     {
         if (ImGui::Button("Deploy", ImVec2(-1, 0)))
         {
@@ -262,7 +281,7 @@ void REModman::draw_mod_deploy_button()
             {
                 if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]))
                 {
-                    ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i], selected_game_path);
+                    ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, GameSelection[game_selection_index]);
                 }
                 else
                 {
@@ -272,7 +291,7 @@ void REModman::draw_mod_deploy_button()
 
             for (int i = 0; i < staged_mod_entries.size(); i++)
             {
-                ModManager::install_mod(selected_profile_path, staged_mod_entries[i], selected_game_path);
+                ModManager::install_mod(selected_profile_path, staged_mod_entries[i], selected_game_path, GameSelection[game_selection_index]);
                 ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]);
             }
 
@@ -285,7 +304,7 @@ void REModman::draw_mod_deploy_button()
 
 void REModman::draw_installed_mod_list()
 {
-    if (!selected_profile_path.empty())
+    if (!selected_profile_path.empty() && !selected_game_path.empty())
     {
         if (!ImGui::CollapsingHeader("Installed Mods", ImGuiTreeNodeFlags_DefaultOpen))
         {
@@ -316,7 +335,7 @@ void REModman::draw_installed_mod_list()
                     {
                         if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]))
                         {
-                            ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i], selected_game_path);
+                            ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, GameSelection[game_selection_index]);
                         }
                         else
                         {
