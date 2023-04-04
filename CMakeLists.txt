@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(imgui_app)
+project(REModman)
 
 set(CMAKE_CXX_STANDARD 17)
 
