@@ -16,9 +16,9 @@ std::vector<std::string> GameSelection = {
 
 void FileDialog::draw_load_profile_dialog()
 {
-    if (ImGui::Button("Load Profile"))
+    if (ImGui::Button("Create / Load Modding Profile"))
     {
-        ImGuiFileDialog::Instance()->OpenDialog("LoadProfileDlgKey", "Choose Folder", nullptr, "");
+        ImGuiFileDialog::Instance()->OpenDialog("LoadProfileDlgKey", "Choose Profile Folder", nullptr, "");
     }
 
     if (ImGuiFileDialog::Instance()->Display("LoadProfileDlgKey", 32, dialog_modal_size))
@@ -60,10 +60,10 @@ void FileDialog::draw_get_game_path_dialog()
 {
     if (ImGui::Button(("Get Game Folder For " + GameSelection[game_selection_index]).c_str()))
     {
-        ImGuiFileDialog::Instance()->OpenDialog("GetGameInstallDlgKey", "Choose Folder", nullptr, "");
+        ImGuiFileDialog::Instance()->OpenDialog("GetGameInstallDlgKey", "Choose Game Folder", nullptr, "");
     }
 
-    if (ImGuiFileDialog::Instance()->Display("GetGameInstallDlgKey"))
+    if (ImGuiFileDialog::Instance()->Display("GetGameInstallDlgKey", 32, dialog_modal_size))
     {
         if (ImGuiFileDialog::Instance()->IsOk())
         {
