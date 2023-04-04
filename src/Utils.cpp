@@ -14,6 +14,16 @@ std::string Utils::string_replace_all(const std::string &baseString, const std::
     return result;
 }
 
+std::string Utils::truncate_string(const std::string &baseString, const int truncateAtLength)
+{
+    if (baseString.length() <= truncateAtLength)
+    {
+        return baseString;
+    }
+
+    return baseString.substr(0, truncateAtLength - 3) + "...";
+}
+
 bool Utils::create_directory(const std::filesystem::path &path)
 {
     if (std::filesystem::exists(path))
