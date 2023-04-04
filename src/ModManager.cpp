@@ -9,7 +9,7 @@ void ModManager::startup_health_checks(const std::string &path)
     JsonUtils::write_empty_json_to_file(path + "/" + "mods_installed.json");
 }
 
-std::vector<nlohmann::json> ModManager::get_mod_entries(const std::string &path)
+std::vector<std::string> ModManager::get_mod_entries(const std::string &path)
 {
     if (!std::filesystem::exists(path))
     {
@@ -17,22 +17,20 @@ std::vector<nlohmann::json> ModManager::get_mod_entries(const std::string &path)
         throw;
     }
 
-    std::vector<nlohmann::json> modEntries;
+    std::vector<std::string> modEntries;
 
     for (const auto &fileEntry : std::filesystem::directory_iterator(path + "/Mods/"))
     {
         if (fileEntry.is_directory())
         {
-            nlohmann::json modEntry;
-            modEntry["SourcePath"] = fileEntry.path().string();
-            modEntries.push_back(modEntry);
+            modEntries.push_back(fileEntry.path().string());
         }
     }
 
     return modEntries;
 }
 
-std::vector<nlohmann::json> ModManager::get_available_mod_entries(const std::string &path)
+std::vector<std::string> ModManager::get_available_mod_entries(const std::string &path)
 {
     if (!std::filesystem::exists(path))
     {
@@ -41,15 +39,15 @@ std::vector<nlohmann::json> ModManager::get_available_mod_entries(const std::str
     }
 
     nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_installed.json");
-    std::vector<nlohmann::json> modEntries = get_mod_entries(path);
-    std::vector<nlohmann::json> currentModEntries;
+    std::vector<std::string> modEntries = get_mod_entries(path);
+    std::vector<std::string> currentModEntries;
 
     for (auto &entry : modEntries)
     {
         bool found = false;
         for (auto &installedMod : modInstallations)
         {
-            if (installedMod["SourcePath"] == entry["SourcePath"])
+            if (installedMod["SourcePath"] == entry)
             {
                 found = true;
                 break;
@@ -65,7 +63,7 @@ std::vector<nlohmann::json> ModManager::get_available_mod_entries(const std::str
     return currentModEntries;
 }
 
-std::vector<nlohmann::json> ModManager::get_staged_mod_entries(const std::string &path)
+std::vector<std::string> ModManager::get_staged_mod_entries(const std::string &path)
 {
     if (!std::filesystem::exists(path))
     {
@@ -73,10 +71,18 @@ std::vector<nlohmann::json> ModManager::get_staged_mod_entries(const std::string
         throw;
     }
 
-    return JsonUtils::load_json(path + "/mods_staging.json");
+    nlohmann::json stagedMods = JsonUtils::load_json(path + "/mods_staging.json");
+    std::vector<std::string> stagedModEntries;
+
+    for (auto &entry : stagedMods)
+    {
+        stagedModEntries.push_back(entry["SourcePath"]);
+    }
+
+    return stagedModEntries;
 }
 
-std::vector<nlohmann::json> ModManager::get_installed_mod_entries(const std::string &path)
+std::vector<std::string> ModManager::get_installed_mod_entries(const std::string &path)
 {
     if (!std::filesystem::exists(path))
     {
@@ -85,11 +91,11 @@ std::vector<nlohmann::json> ModManager::get_installed_mod_entries(const std::str
     }
 
     nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_installed.json");
-    std::vector<nlohmann::json> modInstallationEntries;
+    std::vector<std::string> modInstallationEntries;
 
     for (auto &installedMod : modInstallations)
     {
-        modInstallationEntries.push_back(installedMod);
+        modInstallationEntries.push_back(installedMod["SourcePath"]);
     }
 
     return modInstallationEntries;

@@ -3,9 +3,9 @@
 static int game_selection_index = 0;
 std::string selected_profile_path;
 std::string selected_game_path;
-std::vector<nlohmann::json> staged_mod_entries;
-std::vector<nlohmann::json> available_mod_entries;
-std::vector<nlohmann::json> installed_mod_entries;
+std::vector<std::string> staged_mod_entries;
+std::vector<std::string> available_mod_entries;
+std::vector<std::string> installed_mod_entries;
 
 std::vector<std::string> GameSelection = {
     "None",
@@ -140,7 +140,7 @@ void REModman::draw_mod_list()
         {
             for (int i = 0; i < available_mod_entries.size(); i++)
             {
-                std::filesystem::path sourcePath = available_mod_entries[i]["SourcePath"];
+                std::filesystem::path sourcePath = available_mod_entries[i];
                 std::string label = sourcePath.filename().string();
 
                 if (ImGui::Selectable(label.c_str()))
@@ -157,7 +157,7 @@ void REModman::draw_mod_list()
 
                     if (ImGui::Button("Add", ImVec2(-1, 0)))
                     {
-                        ModManager::stage_mod(selected_profile_path, available_mod_entries[i]["SourcePath"], selected_game_path, load_order);
+                        ModManager::stage_mod(selected_profile_path, available_mod_entries[i], selected_game_path, load_order);
                         staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
                         available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
                         installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
@@ -212,7 +212,7 @@ void REModman::draw_staging_mod_list()
         {
             for (int i = 0; i < staged_mod_entries.size(); i++)
             {
-                std::filesystem::path sourcePath = staged_mod_entries[i]["SourcePath"];
+                std::filesystem::path sourcePath = staged_mod_entries[i];
                 std::string label = sourcePath.filename().string();
 
                 if (ImGui::Selectable(label.c_str()))
@@ -229,7 +229,7 @@ void REModman::draw_staging_mod_list()
 
                     if (ImGui::Button("Remove", ImVec2(-1, 0)))
                     {
-                        ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"]);
+                        ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]);
                         staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
                         available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
                         installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
@@ -260,20 +260,20 @@ void REModman::draw_mod_deploy_button()
         {
             for (int i = 0; i < installed_mod_entries.size(); i++)
             {
-                if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]["SourcePath"]))
+                if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]))
                 {
-                    ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_game_path);
+                    ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i], selected_game_path);
                 }
                 else
                 {
-                    ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"]);
+                    ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]);
                 }
             }
 
             for (int i = 0; i < staged_mod_entries.size(); i++)
             {
-                ModManager::install_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_game_path);
-                ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"]);
+                ModManager::install_mod(selected_profile_path, staged_mod_entries[i], selected_game_path);
+                ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]);
             }
 
             staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
@@ -297,7 +297,7 @@ void REModman::draw_installed_mod_list()
         {
             for (int i = 0; i < installed_mod_entries.size(); i++)
             {
-                std::filesystem::path sourcePath = installed_mod_entries[i]["SourcePath"];
+                std::filesystem::path sourcePath = installed_mod_entries[i];
                 std::string label = sourcePath.filename().string();
 
                 if (ImGui::Selectable(label.c_str()))
@@ -314,13 +314,13 @@ void REModman::draw_installed_mod_list()
 
                     if (ImGui::Button("Uninstall", ImVec2(-1, 0)))
                     {
-                        if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]["SourcePath"]))
+                        if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]))
                         {
-                            ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_game_path);
+                            ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i], selected_game_path);
                         }
                         else
                         {
-                            ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"]);
+                            ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]);
                         }
 
                         staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);

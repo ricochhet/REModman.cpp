@@ -13,10 +13,10 @@
 namespace ModManager
 {
     void startup_health_checks(const std::string &path);
-    std::vector<nlohmann::json> get_mod_entries(const std::string &path);
-    std::vector<nlohmann::json> get_staged_mod_entries(const std::string &path);
-    std::vector<nlohmann::json> get_available_mod_entries(const std::string &path);
-    std::vector<nlohmann::json> get_installed_mod_entries(const std::string &path);
+    std::vector<std::string> get_mod_entries(const std::string &path);
+    std::vector<std::string> get_available_mod_entries(const std::string &path);
+    std::vector<std::string> get_staged_mod_entries(const std::string &path);
+    std::vector<std::string> get_installed_mod_entries(const std::string &path);
     bool contains_pak_files(const std::string &path);
     bool stage_mod(const std::string &path, const std::string &modPath, const std::string &gamePath, const int stagingIndex);
     bool destage_mod(const std::string &path, const std::string &modPath);
