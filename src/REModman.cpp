@@ -30,25 +30,15 @@ void FileDialog::draw_load_profile_dialog()
             JsonUtils::create_or_update_json(filePathName + "/" + "profile.json", "PatchReEnginePakIndex", 2, false);
             selected_profile_path = filePathName;
 
-            Utils::create_directory(selected_profile_path + "/Mods/");
-            Utils::create_directory(selected_profile_path + "/Downloads/");
-            ModManager::init_checks(selected_profile_path + "/" + "profile.json");
-            ModManager::init_checks(selected_profile_path + "/" + "mods_staging.json");
-            ModManager::init_checks(selected_profile_path + "/" + "mods_installed.json");
-            if (JsonUtils::get_string_value(selected_profile_path + "/" + "profile.json", "LastSelectedGame") != "")
-            {
-                game_selection_index = ModManager::get_game_selection(selected_profile_path);
-            }
-
+            ModManager::startup_health_checks(selected_profile_path);
             staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
             available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
             installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
-            Logger::getInstance().log("Found profile path: " + filePathName, LogLevel::Info);
 
-            if (JsonUtils::get_string_value(selected_profile_path + "/" + "profile.json", GameSelection[game_selection_index] + "GamePath") != "")
+            if (!selected_game_path.empty())
             {
-                Logger::getInstance().log("Found existing game path: " + selected_game_path, LogLevel::Info);
-                selected_game_path = JsonUtils::get_string_value(selected_profile_path + "/" + "profile.json", GameSelection[game_selection_index] + "GamePath");
+                game_selection_index = ModManager::get_last_selected_game(selected_profile_path);
+                selected_game_path = ModManager::get_game_path(selected_game_path, GameSelection[game_selection_index]);
             }
         }
 
@@ -142,60 +132,62 @@ void REModman::draw_mod_list()
         }
 
         ImGui::TreePush("AvailableMods");
-        ImGui::BeginListBox("##AvailableModsList", ImVec2(-1, 0));
-
-        for (int i = 0; i < available_mod_entries.size(); i++)
+        if (ImGui::BeginListBox("##AvailableModsList", ImVec2(-1, 0)))
         {
-            std::filesystem::path sourcePath = available_mod_entries[i]["SourcePath"];
-            std::string label = sourcePath.filename().string();
-
-            if (ImGui::Selectable(label.c_str()))
+            for (int i = 0; i < available_mod_entries.size(); i++)
             {
-                ImGui::OpenPopup(label.c_str());
-            }
+                std::filesystem::path sourcePath = available_mod_entries[i]["SourcePath"];
+                std::string label = sourcePath.filename().string();
 
-            if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
-            {
-                ImGui::SetWindowSize(popup_modal_size);
-                ImGui::SetWindowPos(ImVec2(
-                    (ImGui::GetIO().DisplaySize.x / 2) - ImGui::GetContentRegionAvail().x / 2,
-                    (ImGui::GetIO().DisplaySize.y / 2) - ImGui::GetContentRegionAvail().y / 2));
-
-                ImGui::InputInt("Load Order", &load_order);
-                if (ImGui::Button("Add"))
+                if (ImGui::Selectable(label.c_str()))
                 {
-                    ModManager::stage_mod(selected_profile_path, available_mod_entries[i]["SourcePath"], selected_game_path, selected_game_path, load_order);
-                    staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
-                    available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
-                    installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
-
-                    ImGui::CloseCurrentPopup();
+                    ImGui::OpenPopup(label.c_str());
                 }
-                if (std::filesystem::is_directory(sourcePath / "natives") && GameSelection[game_selection_index] == "MonsterHunterRise")
+
+                if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
                 {
-                    ImGui::Separator();
-                    if (ImGui::Button("RisePakPatch"))
+                    ImGui::SetWindowSize(popup_modal_size);
+                    ImGui::SetWindowPos(ImVec2(
+                        (ImGui::GetIO().DisplaySize.x / 2) - ImGui::GetContentRegionAvail().x / 2,
+                        (ImGui::GetIO().DisplaySize.y / 2) - ImGui::GetContentRegionAvail().y / 2));
+
+                    ImGui::InputInt("Load Order", &load_order);
+                    if (ImGui::Button("Add"))
                     {
-                        std::filesystem::path outputPath = sourcePath.string() + " Pak Version/" + (sourcePath.filename().string() + ".pak");
-                        Utils::create_directory(outputPath.parent_path());
-                        RisePakPatch::ProcessDirectory(sourcePath.string(), sourcePath.string() + " Pak Version/" + (sourcePath.filename().string() + ".pak"));
+                        ModManager::stage_mod(selected_profile_path, available_mod_entries[i]["SourcePath"], selected_game_path, selected_game_path, load_order);
                         staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
                         available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
                         installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
 
                         ImGui::CloseCurrentPopup();
                     }
+                    if (std::filesystem::is_directory(sourcePath / "natives") && GameSelection[game_selection_index] == "MonsterHunterRise")
+                    {
+                        ImGui::Separator();
+                        if (ImGui::Button("RisePakPatch"))
+                        {
+                            std::filesystem::path outputPath = sourcePath.string() + " Pak Version/" + (sourcePath.filename().string() + ".pak");
+                            Utils::create_directory(outputPath.parent_path());
+                            RisePakPatch::ProcessDirectory(sourcePath.string(), sourcePath.string() + " Pak Version/" + (sourcePath.filename().string() + ".pak"));
+                            staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
+                            available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
+                            installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
+
+                            ImGui::CloseCurrentPopup();
+                        }
+                    }
+                    ImGui::Separator();
+                    if (ImGui::Button("Exit"))
+                    {
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::EndPopup();
                 }
-                ImGui::Separator();
-                if (ImGui::Button("Exit"))
-                {
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::EndPopup();
             }
+
+            ImGui::EndListBox();
         }
 
-        ImGui::EndListBox();
         ImGui::TreePop();
     }
 }
@@ -210,44 +202,46 @@ void REModman::draw_staging_mod_list()
         }
 
         ImGui::TreePush("Staged Mods");
-        ImGui::BeginListBox("##StagedModsList", ImVec2(-1, 0));
-
-        for (int i = 0; i < staged_mod_entries.size(); i++)
+        if (ImGui::BeginListBox("##StagedModsList", ImVec2(-1, 0)))
         {
-            std::filesystem::path sourcePath = staged_mod_entries[i]["SourcePath"];
-            std::string label = sourcePath.filename().string();
-
-            if (ImGui::Selectable(label.c_str()))
+            for (int i = 0; i < staged_mod_entries.size(); i++)
             {
-                ImGui::OpenPopup(label.c_str());
+                std::filesystem::path sourcePath = staged_mod_entries[i]["SourcePath"];
+                std::string label = sourcePath.filename().string();
+
+                if (ImGui::Selectable(label.c_str()))
+                {
+                    ImGui::OpenPopup(label.c_str());
+                }
+
+                if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
+                {
+                    ImGui::SetWindowSize(popup_modal_size);
+                    ImGui::SetWindowPos(ImVec2(
+                        (ImGui::GetIO().DisplaySize.x / 2) - ImGui::GetContentRegionAvail().x / 2,
+                        (ImGui::GetIO().DisplaySize.y / 2) - ImGui::GetContentRegionAvail().y / 2));
+
+                    if (ImGui::Button("Remove"))
+                    {
+                        ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_game_path);
+                        staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
+                        available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
+                        installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
+
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::Separator();
+                    if (ImGui::Button("Exit"))
+                    {
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::EndPopup();
+                }
             }
 
-            if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
-            {
-                ImGui::SetWindowSize(popup_modal_size);
-                ImGui::SetWindowPos(ImVec2(
-                    (ImGui::GetIO().DisplaySize.x / 2) - ImGui::GetContentRegionAvail().x / 2,
-                    (ImGui::GetIO().DisplaySize.y / 2) - ImGui::GetContentRegionAvail().y / 2));
-
-                if (ImGui::Button("Remove"))
-                {
-                    ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_game_path);
-                    staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
-                    available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
-                    installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
-
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::Separator();
-                if (ImGui::Button("Exit"))
-                {
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::EndPopup();
-            }
+            ImGui::EndListBox();
         }
 
-        ImGui::EndListBox();
         ImGui::TreePop();
     }
 }
@@ -293,52 +287,54 @@ void REModman::draw_installed_mod_list()
         }
 
         ImGui::TreePush("Installed Mods");
-        ImGui::BeginListBox("##InstalledModList", ImVec2(-1, 0));
-
-        for (int i = 0; i < installed_mod_entries.size(); i++)
+        if (ImGui::BeginListBox("##InstalledModList", ImVec2(-1, 0)))
         {
-            std::filesystem::path sourcePath = installed_mod_entries[i]["SourcePath"];
-            std::string label = sourcePath.filename().string();
-
-            if (ImGui::Selectable(label.c_str()))
+            for (int i = 0; i < installed_mod_entries.size(); i++)
             {
-                ImGui::OpenPopup(label.c_str());
+                std::filesystem::path sourcePath = installed_mod_entries[i]["SourcePath"];
+                std::string label = sourcePath.filename().string();
+
+                if (ImGui::Selectable(label.c_str()))
+                {
+                    ImGui::OpenPopup(label.c_str());
+                }
+
+                if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
+                {
+                    ImGui::SetWindowSize(popup_modal_size);
+                    ImGui::SetWindowPos(ImVec2(
+                        (ImGui::GetIO().DisplaySize.x / 2) - ImGui::GetContentRegionAvail().x / 2,
+                        (ImGui::GetIO().DisplaySize.y / 2) - ImGui::GetContentRegionAvail().y / 2));
+
+                    if (ImGui::Button("Uninstall"))
+                    {
+                        if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]["SourcePath"]))
+                        {
+                            ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_game_path);
+                        }
+                        else
+                        {
+                            ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_game_path);
+                        }
+
+                        staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
+                        available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
+                        installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
+
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::Separator();
+                    if (ImGui::Button("Exit"))
+                    {
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::EndPopup();
+                }
             }
 
-            if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove))
-            {
-                ImGui::SetWindowSize(popup_modal_size);
-                ImGui::SetWindowPos(ImVec2(
-                    (ImGui::GetIO().DisplaySize.x / 2) - ImGui::GetContentRegionAvail().x / 2,
-                    (ImGui::GetIO().DisplaySize.y / 2) - ImGui::GetContentRegionAvail().y / 2));
-
-                if (ImGui::Button("Uninstall"))
-                {
-                    if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]["SourcePath"]))
-                    {
-                        ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_game_path);
-                    }
-                    else
-                    {
-                        ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_game_path);
-                    }
-
-                    staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
-                    available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
-                    installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
-
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::Separator();
-                if (ImGui::Button("Exit"))
-                {
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::EndPopup();
-            }
+            ImGui::EndListBox();
         }
 
-        ImGui::EndListBox();
         ImGui::TreePop();
     }
 }

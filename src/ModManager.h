@@ -12,7 +12,7 @@
 
 namespace ModManager
 {
-    void init_checks(const std::string &path);
+    void startup_health_checks(const std::string &path);
     std::vector<nlohmann::json> get_mod_entries(const std::string &path);
     std::vector<nlohmann::json> get_staged_mod_entries(const std::string &path);
     std::vector<nlohmann::json> get_available_mod_entries(const std::string &path);
@@ -25,7 +25,8 @@ namespace ModManager
     bool uninstall_pak_mod(const std::string &path, const std::string &modPath, const std::string &modInstallPath);
     std::vector<nlohmann::json> remove_mod_from_list(const std::vector<nlohmann::json> &listToPatch, const std::string &modPath, const std::string &modInstallPath);
     std::vector<nlohmann::json> remove_mod_from_entries(const std::vector<nlohmann::json> &listToPatch, const std::string &modPath);
-    int get_game_selection(const std::string &path);
+    int get_last_selected_game(const std::string &path);
+    std::string get_game_path(const std::string &path, const std::string &selection);
 }
 
 #endif REMODMAN_MANAGER_INCLUDED

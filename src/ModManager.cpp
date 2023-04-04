@@ -1,15 +1,12 @@
 #include <ModManager.h>
 
-void ModManager::init_checks(const std::string &path)
+void ModManager::startup_health_checks(const std::string &path)
 {
-    std::ifstream fileIn(path);
-
-    if (!fileIn.good()) {
-        std::ofstream fileOut(path);
-        nlohmann::json emptyArray = nlohmann::json::array();
-        fileOut << emptyArray;
-        fileOut.close();
-    }
+    Utils::create_directory(path + "/Mods/");
+    Utils::create_directory(path + "/Downloads/");
+    JsonUtils::write_empty_json_to_file(path + "/" + "profile.json");
+    JsonUtils::write_empty_json_to_file(path + "/" + "mods_staging.json");
+    JsonUtils::write_empty_json_to_file(path + "/" + "mods_installed.json");
 }
 
 std::vector<nlohmann::json> ModManager::get_mod_entries(const std::string &path)
@@ -170,7 +167,7 @@ bool ModManager::destage_mod(const std::string &path, const std::string &modPath
     std::vector<nlohmann::json> j = JsonUtils::load_json(path + "/" + "mods_staging.json");
     j = ModManager::remove_mod_from_list(j, modPath, modInstallPath);
     JsonUtils::write_json_to_file(path + "/" + "mods_staging.json", j);
-    
+
     return true;
 }
 
@@ -388,14 +385,22 @@ std::vector<nlohmann::json> ModManager::remove_mod_from_entries(const std::vecto
     return modInstallations;
 }
 
-int ModManager::get_game_selection(const std::string &path)
+int ModManager::get_last_selected_game(const std::string &path)
 {
-    nlohmann::json j = JsonUtils::load_json(path + "/" + "profile.json");
+    int lastSelectedGameIndex = JsonUtils::get_integer_value(path + "/" + "profile.json", "LastSelectedGame");
+    Logger::getInstance().log("Found profile path: " + path, LogLevel::Info);
+    return lastSelectedGameIndex;
+}
 
-    if (j != nlohmann::json())
+std::string ModManager::get_game_path(const std::string &path, const std::string &selection)
+{
+    std::string gamePath = JsonUtils::get_string_value(path + "/" + "profile.json", selection + "GamePath");
+
+    if (gamePath != "")
     {
-        return j["LastSelectedGame"];
+        Logger::getInstance().log("Found game path: " + path, LogLevel::Info);
+        return gamePath;
     }
 
-    return 0;
+    return std::string();
 }

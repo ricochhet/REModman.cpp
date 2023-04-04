@@ -37,6 +37,18 @@ void JsonUtils::write_json_to_file(const std::string &fileName, const nlohmann::
     }
 }
 
+void JsonUtils::write_empty_json_to_file(const std::string &path)
+{
+    std::ifstream fileIn(path);
+
+    if (!fileIn.good()) {
+        std::ofstream fileOut(path);
+        nlohmann::json emptyArray = nlohmann::json::array();
+        fileOut << emptyArray;
+        fileOut.close();
+    }
+}
+
 std::string JsonUtils::get_string_value(const std::string &path, const std::string &key)
 {
     nlohmann::json j = load_json(path);
