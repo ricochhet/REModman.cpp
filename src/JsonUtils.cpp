@@ -60,7 +60,7 @@ std::string JsonUtils::get_string_value(const std::string &path, const std::stri
     else
     {
         Logger::getInstance().log("Key not found in JSON file at path: " + path, LogLevel::Warning);
-        return "";
+        return std::string();
     }
 }
 

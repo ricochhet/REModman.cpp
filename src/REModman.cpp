@@ -157,7 +157,7 @@ void REModman::draw_mod_list()
 
                     if (ImGui::Button("Add", ImVec2(-1, 0)))
                     {
-                        ModManager::stage_mod(selected_profile_path, available_mod_entries[i]["SourcePath"], selected_game_path, selected_game_path, load_order);
+                        ModManager::stage_mod(selected_profile_path, available_mod_entries[i]["SourcePath"], selected_game_path, load_order);
                         staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
                         available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
                         installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
@@ -229,7 +229,7 @@ void REModman::draw_staging_mod_list()
 
                     if (ImGui::Button("Remove", ImVec2(-1, 0)))
                     {
-                        ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_game_path);
+                        ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"]);
                         staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
                         available_mod_entries = ModManager::get_available_mod_entries(selected_profile_path);
                         installed_mod_entries = ModManager::get_installed_mod_entries(selected_profile_path);
@@ -266,14 +266,14 @@ void REModman::draw_mod_deploy_button()
                 }
                 else
                 {
-                    ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_game_path);
+                    ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"]);
                 }
             }
 
             for (int i = 0; i < staged_mod_entries.size(); i++)
             {
-                ModManager::install_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_game_path, selected_game_path);
-                ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_game_path);
+                ModManager::install_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"], selected_game_path);
+                ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]["SourcePath"]);
             }
 
             staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
@@ -304,7 +304,7 @@ void REModman::draw_installed_mod_list()
                 {
                     ImGui::OpenPopup(label.c_str());
                 }
-                
+
                 ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowSize().x * 0.5f, -1));
                 if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
                 {
@@ -320,7 +320,7 @@ void REModman::draw_installed_mod_list()
                         }
                         else
                         {
-                            ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"], selected_game_path);
+                            ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]["SourcePath"]);
                         }
 
                         staged_mod_entries = ModManager::get_staged_mod_entries(selected_profile_path);
