@@ -15,6 +15,8 @@ int Logger::getColorCode(LogLevel level)
 {
     switch (level)
     {
+    case LogLevel::OK:
+        return 34;
     case LogLevel::Debug:
         return 36;
     case LogLevel::Info:
@@ -36,6 +38,9 @@ void Logger::log(const std::string &message, LogLevel level)
 
         switch (level)
         {
+        case LogLevel::OK:
+            std::cout << "[OK] ";
+            break;
         case LogLevel::Debug:
             std::cout << "[DEBUG] ";
             break;

@@ -8,6 +8,7 @@
 #include <JsonUtils.h>
 #include <ModManager.h>
 #include <Logger.h>
+#include <RisePakPatch.h>
 
 namespace FileDialog
 {

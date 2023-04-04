@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <variant>
+#include <Logger.h>
 
 namespace JsonUtils
 {

@@ -3,13 +3,16 @@ project(imgui_app)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(GLFW_DIR "${CMAKE_SOURCE_DIR}/dependencies/glfw")
+set(GLFW_DIR 
+    "${CMAKE_SOURCE_DIR}/dependencies/glfw"
+)
 option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" OFF)
 option(GLFW_BUILD_TESTS "Build the GLFW test programs" OFF)
 option(GLFW_BUILD_DOCS "Build the GLFW documentation" OFF)
 option(GLFW_INSTALL "Generate installation target" OFF)
 option(GLFW_DOCUMENT_INTERNALS "Include internals in documentation" OFF)
-add_subdirectory(${GLFW_DIR} binary_dir EXCLUDE_FROM_ALL)
+
+add_subdirectory(${GLFW_DIR} glfw.dir EXCLUDE_FROM_ALL)
 include_directories(${GLFW_DIR}/include)
 
 set(IMGUI_SOURCES
@@ -108,8 +111,30 @@ include_directories(
 add_definitions(-DIMGUI_DEFINE_MATH_OPERATORS)
 
 file(GLOB SOURCES "src/*.cpp" "src/include/*.h")
-add_executable(imgui_standalone_window ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_HEADERS} ${LUA_SOURCES} ${IMGUI_FILE_DIALOG_SOURCES} ${IMGUI_FILE_DIALOG_HEADERS} ${NLOHMANN_JSON_SOURCES} ${UTFCPP_SOURCES} ${MURMURHASH3_SOURCES})
 
-target_link_libraries(imgui_standalone_window glfw)
+set(APPLICATION_ICON
+    "${CMAKE_CURRENT_SOURCE_DIR}/res/remodman-icon-1024.png"
+)
+configure_file(
+    ${APPLICATION_ICON} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY
+)
+
+set(ICON_WIN_RC "${CMAKE_CURRENT_SOURCE_DIR}/icon.rc")
+
+add_executable(REModman
+    ${ICON_WIN_RC}
+    ${APPLICATION_ICON}
+    ${SOURCES}
+    ${IMGUI_SOURCES} 
+    ${IMGUI_HEADERS} 
+    ${LUA_SOURCES} 
+    ${IMGUI_FILE_DIALOG_SOURCES}
+    ${IMGUI_FILE_DIALOG_HEADERS} 
+    ${NLOHMANN_JSON_SOURCES} 
+    ${UTFCPP_SOURCES} 
+    ${MURMURHASH3_SOURCES}
+)
+
+target_link_libraries(REModman glfw)
 find_package(OpenGL REQUIRED)
-target_link_libraries(imgui_standalone_window OpenGL::GL)
+target_link_libraries(REModman OpenGL::GL)

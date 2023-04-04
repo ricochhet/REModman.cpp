@@ -10,6 +10,7 @@
 #include <fstream>
 #include <vector>
 #include <Utils.h>
+#include <Logger.h>
 
 struct FileEntry
 {

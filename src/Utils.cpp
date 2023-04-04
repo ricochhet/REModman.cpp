@@ -13,3 +13,13 @@ std::string Utils::string_replace_all(const std::string &baseString, const std::
 
     return result;
 }
+
+bool Utils::create_directory(const std::filesystem::path &path)
+{
+    if (std::filesystem::exists(path))
+    {
+        return true;
+    }
+
+    return std::filesystem::create_directory(path) && std::filesystem::is_directory(path);
+}

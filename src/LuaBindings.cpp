@@ -17,8 +17,6 @@ int LuaBindings::create_lua_state()
     lua_pushcfunction(L, chunk);
     lua_register(L, "logger", LuaBindings::logger);
     lua_call(L, 1, 0);
-
-    // lua_close(L);
     
     return 0;
 }

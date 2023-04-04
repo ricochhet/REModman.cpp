@@ -36,6 +36,7 @@ void RisePakPatch::ProcessDirectory(const std::string &path, const std::string &
 
     if (std::filesystem::exists(outputFile))
     {
+        Logger::getInstance().log("Deleting existing output file...", LogLevel::Info);
         std::filesystem::remove(outputFile);
     }
 
@@ -54,6 +55,7 @@ void RisePakPatch::ProcessDirectory(const std::string &path, const std::string &
         }
         return std::filesystem::path(a).parent_path() < std::filesystem::path(b).parent_path(); });
 
+    Logger::getInstance().log("Processing " + std::to_string(sortedFiles.size()) + " files", LogLevel::Info);
     std::vector<FileEntry> list;
     Writer writer(outputFile);
     writer.WriteUInt32(1095454795u);
@@ -90,6 +92,7 @@ void RisePakPatch::ProcessDirectory(const std::string &path, const std::string &
     writer.SeekFromBeginning(16);
     for (const FileEntry &item : list)
     {
+        Logger::getInstance().log(item.fileName + " " + std::to_string(item.fileNameUpper) + " " + std::to_string(item.fileNameLower), LogLevel::Info);
         writer.WriteUInt32(item.fileNameLower);
         writer.WriteUInt32(item.fileNameUpper);
         writer.WriteUInt64(item.offset);

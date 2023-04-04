@@ -3,7 +3,7 @@
 void ModManager::init_checks(const std::string &path)
 {
     std::ifstream file_check(path);
-    
+
     if (!file_check.good()) {
         std::ofstream file_create(path);
         nlohmann::json empty_array = nlohmann::json::array();
@@ -16,6 +16,7 @@ std::vector<nlohmann::json> ModManager::get_mod_entries(const std::string &path)
 {
     if (!std::filesystem::exists(path))
     {
+        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
         throw;
     }
 
@@ -38,6 +39,7 @@ std::vector<nlohmann::json> ModManager::get_available_mod_entries(const std::str
 {
     if (!std::filesystem::exists(path))
     {
+        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
         throw;
     }
 
@@ -70,6 +72,7 @@ std::vector<nlohmann::json> ModManager::get_staged_mod_entries(const std::string
 {
     if (!std::filesystem::exists(path))
     {
+        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
         throw;
     }
 
@@ -80,6 +83,7 @@ std::vector<nlohmann::json> ModManager::get_installed_mod_entries(const std::str
 {
     if (!std::filesystem::exists(path))
     {
+        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
         throw;
     }
 
@@ -98,6 +102,7 @@ bool ModManager::contains_pak_files(const std::string &path)
 {
     if (!std::filesystem::exists(path))
     {
+        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
         throw;
     }
 
@@ -124,6 +129,7 @@ bool ModManager::stage_mod(const std::string &path, const std::string &modPath, 
 {
     if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath) || !std::filesystem::exists(gamePath))
     {
+        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
         return false;
     }
 
@@ -250,6 +256,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
     }
     else
     {
+        Logger::getInstance().log("Failed to open mods_installed.json.", LogLevel::Warning);
         throw std::runtime_error("Failed to open mods_installed.json.");
     }
 
@@ -275,6 +282,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
             }
             else
             {
+                Logger::getInstance().log("Failed to open mods_installed.json.", LogLevel::Warning);
                 throw std::runtime_error("Failed to open mods_installed.json.");
             }
 
@@ -282,6 +290,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
         }
     }
 
+    Logger::getInstance().log("Mod installation not found.", LogLevel::Warning);
     throw std::runtime_error("Mod installation not found.");
 }
 
@@ -333,6 +342,7 @@ std::vector<nlohmann::json> ModManager::remove_mod_from_list(const std::vector<n
 {
     if (!std::filesystem::exists(modPath))
     {
+        Logger::getInstance().log("Mod path does not exist: " + modPath, LogLevel::Warning);
         throw;
     }
 
@@ -357,6 +367,7 @@ std::vector<nlohmann::json> ModManager::remove_mod_from_entries(const std::vecto
 {
     if (!std::filesystem::exists(modPath))
     {
+        Logger::getInstance().log("Mod path does not exist: " + modPath, LogLevel::Warning);
         throw;
     }
 

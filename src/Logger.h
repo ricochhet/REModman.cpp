@@ -8,6 +8,7 @@
 
 enum class LogLevel
 {
+    OK,
     Debug,
     Info,
     Warning,

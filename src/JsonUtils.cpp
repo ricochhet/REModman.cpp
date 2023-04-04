@@ -2,7 +2,7 @@
 
 void log_json(const nlohmann::json &j)
 {
-    std::cout << j.dump(4) << std::endl;
+    Logger::getInstance().log(j.dump(4), LogLevel::Info);
 }
 
 nlohmann::json JsonUtils::load_json(const std::string &path)
@@ -17,7 +17,7 @@ nlohmann::json JsonUtils::load_json(const std::string &path)
     }
     else
     {
-        std::cout << "Failed to load JSON file at path: " << path << std::endl;
+        Logger::getInstance().log("Failed to load JSON file at path: " + path, LogLevel::Error);
         return nlohmann::json();
     }
 }
@@ -31,6 +31,10 @@ void JsonUtils::write_json_to_file(const std::string &fileName, const nlohmann::
         fileOut << j.dump(4) << std::endl;
         fileOut.close();
     }
+    else
+    {
+        Logger::getInstance().log("Failed to write JSON file: " + fileName, LogLevel::Error);
+    }
 }
 
 std::string JsonUtils::get_string_value(const std::string &path, const std::string &key)
@@ -43,7 +47,7 @@ std::string JsonUtils::get_string_value(const std::string &path, const std::stri
     }
     else
     {
-        std::cout << "Key not found in JSON file at path: " << path << std::endl;
+        Logger::getInstance().log("Key not found in JSON file at path: " + path, LogLevel::Error);
         return "";
     }
 }
@@ -58,7 +62,7 @@ int JsonUtils::get_integer_value(const std::string &path, const std::string &key
     }
     else
     {
-        std::cout << "Key not found in JSON file at path: " << path << std::endl;
+        Logger::getInstance().log("Key not found in JSON file at path: " + path, LogLevel::Error);
         return 0;
     }
 }
@@ -91,7 +95,7 @@ void JsonUtils::create_or_update_json(const std::string &path, const std::string
         {
             if (update)
             {
-                std::cout << "Updating " << key << " in the JSON" << std::endl;
+                Logger::getInstance().log("Updating " + key + " in JSON", LogLevel::Info);
                 if (std::holds_alternative<std::string>(value))
                 {
                     *it = std::get<std::string>(value);

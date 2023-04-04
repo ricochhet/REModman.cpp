@@ -1,4 +1,9 @@
+#ifndef STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#endif STB_IMAGE_IMPLEMENTATION
+
 #include <ImGuiWindow.h>
+#include <stb_image.h>
 
 static void glfw_error_callback(int error, const char *description)
 {
@@ -82,49 +87,49 @@ int ImGuiWindow::create_imgui_window()
         return 1;
     }
 
-    GLFWwindow *window = glfwCreateWindow(800, 600, "ImGui Example", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(800, 650, "REModman", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
         return 1;
     }
 
+    GLFWimage icon[1];
+    icon[0].pixels = stbi_load("remodman-icon-1024.png", &icon[0].width, &icon[0].height, 0, 4);
+    glfwSetWindowIcon(window, 1, icon);
+    stbi_image_free(icon[0].pixels);
+
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-
     ImGuiIO &io = ImGui::GetIO();
     setup_imgui_fonts(io);
     (void)io;
+    ImGui::GetIO().IniFilename = "remodman_ui.ini";
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
     setup_imgui_style();
 
-    // Main loop
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
 
-        // Start the ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // Set the ImGui viewport to the size of the window
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
         ImGui::SetNextWindowPos(ImVec2(0, 0));
 
-        // Create an ImGui window that fills the entire viewport
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
         ImGui::Begin("Main", NULL, window_flags);
         ImGuiWindow::setup_imgui_window();
         ImGui::End();
 
-        // Rendering
         ImGui::Render();
         glViewport(0, 0, display_w, display_h);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -134,7 +139,6 @@ int ImGuiWindow::create_imgui_window()
         glfwSwapBuffers(window);
     }
 
-    // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
