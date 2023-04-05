@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <ModManagerDefinitions.h>
 #include <JsonUtils.h>
+#include <ModManagerDefinitions.h>
 
 #include <filesystem>
 #include <iostream>

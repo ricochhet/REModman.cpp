@@ -135,7 +135,9 @@ bool ModManager::destage_mod(const std::string& path, const std::string& modPath
     std::vector<ModManagerData::Mod> j =
         ModManagerData::mods_from_json(JsonUtils::load_json(path + REMM_MODS_STAGING_FILE_NAME));
     j = ModManager::remove_mod_from_list(j, modPath);
-    JsonUtils::write_json_to_file(path + REMM_MODS_STAGING_FILE_NAME, ModManagerData::mods_to_json(j));
+    JsonUtils::write_json_to_file(
+        path + REMM_MODS_STAGING_FILE_NAME, ModManagerData::mods_to_json(j)
+    );
 
     return true;
 }
