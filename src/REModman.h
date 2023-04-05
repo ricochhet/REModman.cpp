@@ -5,7 +5,6 @@
 
 #include <imgui.h>
 #include <ImGuiFileDialog.h>
-#include <JsonUtils.h>
 #include <ModManager.h>
 #include <Logger.h>
 #include <RisePakPatch.h>
@@ -26,6 +25,8 @@ namespace REModman
     void draw_staging_mod_list();
     void draw_mod_deploy_button();
     void draw_installed_mod_list();
+
+    void reload_mod_entries();
 }
 
 #endif // REMODMAN_INCLUDED

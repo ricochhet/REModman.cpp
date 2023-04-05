@@ -19,6 +19,8 @@ namespace ModManagerPatches
         };
 
         PatchReEnginePak patch_re_engine_pak(const std::string &path, const std::string &modPath);
+        bool contains_pak_files(const std::string &path);
+        void set_patch_in_profile(const std::string &path, const int &index);
     }
 }
 

@@ -1,15 +1,15 @@
 #include <ModManager.h>
 
-void ModManager::startup_health_checks(const std::string &path)
+void ModManager::initialize(const std::string &path)
 {
-    Utils::create_directory(path + "/Mods/");
-    Utils::create_directory(path + "/Downloads/");
-    JsonUtils::write_empty_json_to_file(path + "/" + "profile.json");
-    JsonUtils::write_empty_json_to_file(path + "/" + "mods_staging.json");
-    JsonUtils::write_empty_json_to_file(path + "/" + "mods_installed.json");
+    Utils::create_directory(path + MODS_FOLDER);
+    Utils::create_directory(path + DOWNLOADS_FOLDER);
+    JsonUtils::write_empty_json_to_file(path + PROFILE_FILE_NAME);
+    JsonUtils::write_empty_json_to_file(path + MODS_STAGING_FILE_NAME);
+    JsonUtils::write_empty_json_to_file(path + MODS_INSTALLED_FILE_NAME);
 }
 
-std::vector<std::string> ModManager::get_mod_entries(const std::string &path)
+std::vector<std::string> ModManager::get_mod_directories(const std::string &path)
 {
     if (!std::filesystem::exists(path))
     {
@@ -19,7 +19,7 @@ std::vector<std::string> ModManager::get_mod_entries(const std::string &path)
 
     std::vector<std::string> modEntries;
 
-    for (const auto &fileEntry : std::filesystem::directory_iterator(path + "/Mods/"))
+    for (const auto &fileEntry : std::filesystem::directory_iterator(path + MODS_FOLDER))
     {
         if (fileEntry.is_directory())
         {
@@ -30,7 +30,7 @@ std::vector<std::string> ModManager::get_mod_entries(const std::string &path)
     return modEntries;
 }
 
-std::vector<std::string> ModManager::get_available_mod_entries(const std::string &path)
+std::vector<std::string> ModManager::get_mod_entries(const std::string &path, const std::string &file, const bool compare)
 {
     if (!std::filesystem::exists(path))
     {
@@ -38,94 +38,41 @@ std::vector<std::string> ModManager::get_available_mod_entries(const std::string
         throw;
     }
 
-    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/" + "mods_installed.json"));
-    std::vector<std::string> modEntries = get_mod_entries(path);
-    std::vector<std::string> currentModEntries;
+    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + file));
+    std::vector<std::string> modEntries;
+    std::vector<std::string> compareEntries;
 
-    for (auto &entry : modEntries)
+    if (compare)
     {
-        bool found = false;
-        for (auto &installedMod : modInstallations)
+        compareEntries = get_mod_directories(path);
+
+        for (const auto &entry : compareEntries)
         {
-            if (installedMod.SourcePath == entry)
+            bool found = false;
+            for (const auto &installedMod : modInstallations)
             {
-                found = true;
-                break;
+                if (installedMod.SourcePath == entry)
+                {
+                    found = true;
+                    break;
+                }
             }
-        }
 
-        if (!found)
-        {
-            currentModEntries.push_back(entry);
-        }
-    }
-
-    return currentModEntries;
-}
-
-std::vector<std::string> ModManager::get_staged_mod_entries(const std::string &path)
-{
-    if (!std::filesystem::exists(path))
-    {
-        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
-        throw;
-    }
-
-    std::vector<ModManagerData::Mod> stagedMods = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/mods_staging.json"));
-    std::vector<std::string> stagedModEntries;
-
-    for (auto &entry : stagedMods)
-    {
-        stagedModEntries.push_back(entry.SourcePath);
-    }
-
-    return stagedModEntries;
-}
-
-std::vector<std::string> ModManager::get_installed_mod_entries(const std::string &path)
-{
-    if (!std::filesystem::exists(path))
-    {
-        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
-        throw;
-    }
-
-    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/mods_installed.json"));
-    std::vector<std::string> modInstallationEntries;
-
-    for (auto &installedMod : modInstallations)
-    {
-        modInstallationEntries.push_back(installedMod.SourcePath);
-    }
-
-    return modInstallationEntries;
-}
-
-bool ModManager::contains_pak_files(const std::string &path)
-{
-    if (!std::filesystem::exists(path))
-    {
-        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
-        throw;
-    }
-
-    bool isPakMod = false;
-
-    for (const auto &fileEntry : std::filesystem::directory_iterator(path))
-    {
-        if (fileEntry.is_regular_file())
-        {
-            std::string fileName = fileEntry.path().filename().string();
-
-            if (fileName.substr(fileName.find_last_of(".") + 1) == "pak")
+            if (!found)
             {
-                isPakMod = true;
-                break;
+                modEntries.push_back(entry);
             }
         }
     }
+    else
+    {
+        for (auto &entry : modInstallations)
+        {
+            modEntries.push_back(entry.SourcePath);
+        }
+    }
 
-    return isPakMod;
+    return modEntries;
 }
 
 bool ModManager::stage_mod(const std::string &path, const std::string &modPath, const std::string &gamePath, const int stagingIndex)
@@ -142,10 +89,9 @@ bool ModManager::stage_mod(const std::string &path, const std::string &modPath, 
     {
         if (fileEntry.is_regular_file())
         {
-            std::string relative_path = std::filesystem::relative(fileEntry.path(), modPath).string();
-            std::string filename = fileEntry.path().filename().string();
-            std::string gameFile = gamePath + "/" + relative_path;
-            
+            std::string relativePath = std::filesystem::relative(fileEntry.path(), modPath).string();
+            std::string gameFile = gamePath + "/" + relativePath;
+
             ModManagerData::File file;
             file.SourcePath = fileEntry.path().string();
             file.InstallPath = gameFile;
@@ -157,7 +103,7 @@ bool ModManager::stage_mod(const std::string &path, const std::string &modPath, 
     installedMod.SourcePath = modPath;
     installedMod.Files = modFiles;
 
-    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/" + "mods_staging.json"));
+    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + MODS_STAGING_FILE_NAME));
     size_t stagingIterator = stagingIndex;
     if (stagingIterator >= modInstallations.size())
     {
@@ -166,16 +112,16 @@ bool ModManager::stage_mod(const std::string &path, const std::string &modPath, 
 
     std::vector<ModManagerData::Mod>::iterator stageIter = modInstallations.begin() + stagingIterator;
     modInstallations.insert(stageIter, installedMod);
-    JsonUtils::write_json_to_file(path + "/" + "mods_staging.json", ModManagerData::mods_to_json(modInstallations));
+    JsonUtils::write_json_to_file(path + MODS_STAGING_FILE_NAME, ModManagerData::mods_to_json(modInstallations));
 
     return true;
 }
 
 bool ModManager::destage_mod(const std::string &path, const std::string &modPath)
 {
-    std::vector<ModManagerData::Mod> j = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/" + "mods_staging.json"));
+    std::vector<ModManagerData::Mod> j = ModManagerData::mods_from_json(JsonUtils::load_json(path + MODS_STAGING_FILE_NAME));
     j = ModManager::remove_mod_from_list(j, modPath);
-    JsonUtils::write_json_to_file(path + "/" + "mods_staging.json", ModManagerData::mods_to_json(j));
+    JsonUtils::write_json_to_file(path + MODS_STAGING_FILE_NAME, ModManagerData::mods_to_json(j));
 
     return true;
 }
@@ -223,9 +169,9 @@ bool ModManager::install_mod(const std::string &path, const std::string &modPath
     installedMod.SourcePath = modPath;
     installedMod.Files = modFiles;
 
-    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/" + "mods_installed.json"));
+    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + MODS_INSTALLED_FILE_NAME));
     modInstallations.push_back(installedMod);
-    JsonUtils::write_json_to_file(path + "/" + "mods_installed.json", ModManagerData::mods_to_json(modInstallations));
+    JsonUtils::write_json_to_file(path + MODS_INSTALLED_FILE_NAME, ModManagerData::mods_to_json(modInstallations));
 
     return true;
 }
@@ -237,7 +183,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
         return false;
     }
 
-    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/" + "mods_installed.json"));
+    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + MODS_INSTALLED_FILE_NAME));
 
     for (const auto &installedMod : modInstallations)
     {
@@ -252,7 +198,7 @@ bool ModManager::uninstall_mod(const std::string &path, const std::string &modPa
             }
 
             modInstallations = ModManager::remove_mod_from_list(modInstallations, installedMod.SourcePath);
-            JsonUtils::write_json_to_file(path + "/mods_installed.json", ModManagerData::mods_to_json(modInstallations));
+            JsonUtils::write_json_to_file(path + MODS_INSTALLED_FILE_NAME, ModManagerData::mods_to_json(modInstallations));
 
             return true;
         }
@@ -269,7 +215,7 @@ bool ModManager::uninstall_pak_mod(const std::string &path, const std::string &m
         return false;
     }
 
-    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/" + "mods_installed.json"));
+    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + MODS_INSTALLED_FILE_NAME));
     std::vector<ModManagerData::Mod> pakModInstallations;
 
     for (const auto &installedMod : modInstallations)
@@ -296,7 +242,11 @@ bool ModManager::uninstall_pak_mod(const std::string &path, const std::string &m
     }
 
     std::vector<ModManagerData::Mod> pakModsToReinstall = ModManager::remove_mod_from_list(pakModInstallations, modPath);
-    JsonUtils::create_or_update_json(path + "/profile.json", {"Patches", "MonsterHunterRise", "PatchReEnginePakIndex"}, 2, true);
+
+    if (gameSelection == "MonsterHunterRise")
+    {
+        ModManagerPatches::MonsterHunterRise::set_patch_in_profile(path, 2);
+    }
 
     for (const auto &modToReinstall : pakModsToReinstall)
     {
@@ -329,24 +279,4 @@ std::vector<ModManagerData::Mod> ModManager::remove_mod_from_list(const std::vec
     }
 
     return modInstallations;
-}
-
-int ModManager::get_last_selected_game(const std::string &path)
-{
-    int lastSelectedGameIndex = JsonUtils::get_integer_value(path + "/" + "profile.json", {"LastSelectedGame"});
-    Logger::getInstance().log("Found profile path: " + path, LogLevel::Info);
-    return lastSelectedGameIndex;
-}
-
-std::string ModManager::get_game_path(const std::string &path, const std::string &selection)
-{
-    std::string gamePath = JsonUtils::get_string_value(path + "/" + "profile.json", {"Games", selection + "GamePath"});
-
-    if (!gamePath.empty())
-    {
-        Logger::getInstance().log("Found game path: " + path, LogLevel::Info);
-        return gamePath;
-    }
-
-    return std::string();
 }
