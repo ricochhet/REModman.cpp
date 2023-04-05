@@ -276,17 +276,17 @@ void REModman::draw_mod_deploy_button()
     {
         if (ImGui::Button("Deploy", ImVec2(-1, 0)))
         {
-            // for (int i = 0; i < installed_mod_entries.size(); i++)
-            // {
-            //     if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]))
-            //     {
-            //         ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, GameSelection[game_selection_index]);
-            //     }
-            //     else
-            //     {
-            //         ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]);
-            //     }
-            // }
+            for (int i = 0; i < installed_mod_entries.size(); i++)
+            {
+                if (GameSelection[game_selection_index] == "MonsterHunterRise" && ModManager::contains_pak_files(installed_mod_entries[i]))
+                {
+                    ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, GameSelection[game_selection_index]);
+                }
+                else
+                {
+                    ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]);
+                }
+            }
 
             for (int i = 0; i < staged_mod_entries.size(); i++)
             {
