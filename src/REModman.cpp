@@ -269,7 +269,16 @@ void REModman::draw_mod_deploy_button() {
                 } else {
                     ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]);
                 }
+
+                ModManager::stage_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, i);
             }
+
+            reload_mod_entries();
+
+            /*for (int i = 0; i < reinstallList.size(); i++)
+            {
+                ModManager::install_mod(selected_game_path, reinstallList[i], selected_game_path, GameSelection[game_selection_index]);
+            }*/
 
             for (int i = 0; i < staged_mod_entries.size(); i++) {
                 ModManager::install_mod(
@@ -279,6 +288,8 @@ void REModman::draw_mod_deploy_button() {
                 ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]);
             }
         }
+
+        reload_mod_entries();
     }
 }
 

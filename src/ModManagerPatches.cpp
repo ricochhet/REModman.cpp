@@ -57,6 +57,6 @@ void ModManagerPatches::MonsterHunterRise::set_patch_in_profile(
 ) {
     JsonUtils::create_or_update_json(
         path + "/" + "profile.json", {"Patches", "MonsterHunterRise", "PatchReEnginePakIndex"},
-        index, false
+        index, true
     );
 }
