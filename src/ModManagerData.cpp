@@ -44,6 +44,11 @@ nlohmann::json ModManagerData::mods_to_json(const std::vector<ModManagerData::Mo
         j.push_back(mod_to_json(mod));
     }
 
+    if (j.empty())
+    {
+        return nlohmann::json::array();
+    }
+
     return j;
 }
 

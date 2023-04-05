@@ -181,9 +181,11 @@ bool ModManager::stage_mod(const std::string &path, const std::string &modPath, 
 
 bool ModManager::destage_mod(const std::string &path, const std::string &modPath)
 {
-    std::vector<nlohmann::json> j = JsonUtils::load_json(path + "/" + "mods_staging.json");
+    std::vector<ModManagerData::Mod> j = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/" + "mods_staging.json"));
+    // std::vector<nlohmann::json> j = JsonUtils::load_json(path + "/" + "mods_staging.json");
     j = ModManager::remove_mod_from_list(j, modPath);
-    JsonUtils::write_json_to_file(path + "/" + "mods_staging.json", j);
+    // j = ModManager::remove_mod_from_list(j, modPath);
+    JsonUtils::write_json_to_file(path + "/" + "mods_staging.json", ModManagerData::mods_to_json(j));
 
     return true;
 }
@@ -346,6 +348,31 @@ std::vector<nlohmann::json> ModManager::remove_mod_from_list(const std::vector<n
     for (auto it = modInstallations.begin(); it != modInstallations.end();)
     {
         if ((*it)["SourcePath"] == modPath)
+        {
+            it = modInstallations.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    return modInstallations;
+}
+
+std::vector<ModManagerData::Mod> ModManager::remove_mod_from_list(const std::vector<ModManagerData::Mod> &listToPatch, const std::string &modPath)
+{
+    if (!std::filesystem::exists(modPath))
+    {
+        Logger::getInstance().log("Mod path does not exist: " + modPath, LogLevel::Warning);
+        throw;
+    }
+
+    std::vector<ModManagerData::Mod> modInstallations = listToPatch;
+
+    for (auto it = modInstallations.begin(); it != modInstallations.end();)
+    {
+        if ((*it).SourcePath == modPath)
         {
             it = modInstallations.erase(it);
         }
