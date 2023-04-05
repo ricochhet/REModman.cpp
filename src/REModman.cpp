@@ -170,7 +170,7 @@ void REModman::draw_mod_list() {
                     if (ImGui::Button("Add", ImVec2(-1, 0))) {
                         ModManager::stage_mod(
                             selected_profile_path, available_mod_entries[i], selected_game_path,
-                            load_order
+                            GameSelection[game_selection_index], load_order
                         );
                         reload_mod_entries();
                         ImGui::CloseCurrentPopup();
@@ -270,15 +270,10 @@ void REModman::draw_mod_deploy_button() {
                     ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]);
                 }
 
-                ModManager::stage_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, i);
+                ModManager::stage_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, GameSelection[game_selection_index], i);
             }
 
             reload_mod_entries();
-
-            /*for (int i = 0; i < reinstallList.size(); i++)
-            {
-                ModManager::install_mod(selected_game_path, reinstallList[i], selected_game_path, GameSelection[game_selection_index]);
-            }*/
 
             for (int i = 0; i < staged_mod_entries.size(); i++) {
                 ModManager::install_mod(

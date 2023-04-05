@@ -21,9 +21,10 @@ namespace ModManager {
     std::vector<std::string> get_mod_entries(
         const std::string& path, const std::string& file, const bool compare
     );
+    std::vector<ModManagerData::File> load_mod_files(const std::string& path, const std::string &modPath, const std::string &gamePath, const std::string &gameSelection);
     bool stage_mod(
         const std::string& path, const std::string& modPath, const std::string& gamePath,
-        const int stagingIndex
+        const std::string& gameSelection, const int stagingIndex
     );
     bool destage_mod(const std::string& path, const std::string& modPath);
     bool install_mod(

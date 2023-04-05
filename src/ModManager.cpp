@@ -63,9 +63,41 @@ std::vector<std::string> ModManager::get_mod_entries(
     return modEntries;
 }
 
+std::vector<ModManagerData::File> ModManager::load_mod_files(const std::string& path, const std::string &modPath, const std::string &gamePath, const std::string &gameSelection)
+{
+    std::vector<ModManagerData::File> modFiles;
+
+    ModManagerPatches::MonsterHunterRise::PatchReEnginePak mhrPatchReEnginePak =
+        ModManagerPatches::MonsterHunterRise::patch_re_engine_pak(path, modPath);
+
+    for (const auto &fileEntry : std::filesystem::recursive_directory_iterator(modPath))
+    {
+        if (fileEntry.is_regular_file())
+        {
+            std::string relativePath = std::filesystem::relative(fileEntry.path(), modPath).string();
+            std::string fileName = fileEntry.path().filename().string();
+
+            if (mhrPatchReEnginePak.isPak && gameSelection == "MonsterHunterRise")
+            {
+                std::string pakFileName =
+                    "re_chunk_000.pak.patch_" + std::to_string(mhrPatchReEnginePak.pakIndex).insert(0, 3 - std::to_string(mhrPatchReEnginePak.pakIndex).length(), '0') + ".pak";
+                relativePath = Utils::string_replace_all(relativePath, fileName, pakFileName);
+            }
+
+            std::string gameFile = gamePath + "/" + relativePath;
+            ModManagerData::File file;
+            file.SourcePath = fileEntry.path().string();
+            file.InstallPath = gameFile;
+            modFiles.push_back(file);
+        }
+    }
+
+    return modFiles;
+}
+
 bool ModManager::stage_mod(
     const std::string& path, const std::string& modPath, const std::string& gamePath,
-    const int stagingIndex
+    const std::string& gameSelection, const int stagingIndex
 ) {
     if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath) ||
         !std::filesystem::exists(gamePath)) {
@@ -73,21 +105,7 @@ bool ModManager::stage_mod(
         return false;
     }
 
-    std::vector<ModManagerData::File> modFiles;
-
-    for (const auto& fileEntry : std::filesystem::recursive_directory_iterator(modPath)) {
-        if (fileEntry.is_regular_file()) {
-            std::string relativePath =
-                std::filesystem::relative(fileEntry.path(), modPath).string();
-            std::string gameFile = gamePath + "/" + relativePath;
-
-            ModManagerData::File file;
-            file.SourcePath  = fileEntry.path().string();
-            file.InstallPath = gameFile;
-            modFiles.push_back(file);
-        }
-    }
-
+    std::vector<ModManagerData::File> modFiles = load_mod_files(path, modPath, gamePath, gameSelection);
     ModManagerData::Mod installedMod;
     installedMod.SourcePath = modPath;
     installedMod.Files      = modFiles;
@@ -127,33 +145,7 @@ bool ModManager::install_mod(
         return false;
     }
 
-    ModManagerPatches::MonsterHunterRise::PatchReEnginePak mhrPatchReEnginePak =
-        ModManagerPatches::MonsterHunterRise::patch_re_engine_pak(path, modPath);
-
-    std::vector<ModManagerData::File> modFiles;
-    for (const auto& fileEntry : std::filesystem::recursive_directory_iterator(modPath)) {
-        if (fileEntry.is_regular_file()) {
-            std::string relativePath =
-                std::filesystem::relative(fileEntry.path(), modPath).string();
-            std::string fileName = fileEntry.path().filename().string();
-
-            if (mhrPatchReEnginePak.isPak && gameSelection == "MonsterHunterRise") {
-                std::string pakFileName =
-                    "re_chunk_000.pak.patch_" +
-                    std::to_string(mhrPatchReEnginePak.pakIndex)
-                        .insert(0, 3 - std::to_string(mhrPatchReEnginePak.pakIndex).length(), '0') +
-                    ".pak";
-                relativePath = Utils::string_replace_all(relativePath, fileName, pakFileName);
-            }
-
-            std::string          gameFile = gamePath + "/" + relativePath;
-            ModManagerData::File file;
-            file.SourcePath  = fileEntry.path().string();
-            file.InstallPath = gameFile;
-            modFiles.push_back(file);
-        }
-    }
-
+    std::vector<ModManagerData::File> modFiles = load_mod_files(path, modPath, gamePath, gameSelection);
     for (const auto& file : modFiles) {
         std::filesystem::create_directories(std::filesystem::path(file.InstallPath).parent_path());
         std::filesystem::copy_file(
