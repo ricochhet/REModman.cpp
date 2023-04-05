@@ -90,12 +90,12 @@ std::vector<std::string> ModManager::get_installed_mod_entries(const std::string
         throw;
     }
 
-    nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_installed.json");
+    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/mods_installed.json"));
     std::vector<std::string> modInstallationEntries;
 
     for (auto &installedMod : modInstallations)
     {
-        modInstallationEntries.push_back(installedMod["SourcePath"]);
+        modInstallationEntries.push_back(installedMod.SourcePath);
     }
 
     return modInstallationEntries;
@@ -200,39 +200,50 @@ bool ModManager::install_mod(const std::string &path, const std::string &modPath
     ModManagerPatches::MonsterHunterRise::PatchReEnginePak mhrPatchReEnginePak =
         ModManagerPatches::MonsterHunterRise::patch_re_engine_pak(path, modPath);
 
-    nlohmann::json modFiles;
+    std::vector<ModManagerData::File> modFiles;
+    // nlohmann::json modFiles;
     for (const auto &fileEntry : std::filesystem::recursive_directory_iterator(modPath))
     {
         if (fileEntry.is_regular_file())
         {
-            std::string relative_path = std::filesystem::relative(fileEntry.path(), modPath).string();
-            std::string filename = fileEntry.path().filename().string();
+            std::string relativePath = std::filesystem::relative(fileEntry.path(), modPath).string();
+            std::string fileName = fileEntry.path().filename().string();
 
             if (mhrPatchReEnginePak.isPak && gameSelection == "MonsterHunterRise")
             {
                 std::string pakFileName =
                     "re_chunk_000.pak.patch_" + std::to_string(mhrPatchReEnginePak.pakIndex).insert(0, 3 - std::to_string(mhrPatchReEnginePak.pakIndex).length(), '0') + ".pak";
-                relative_path = Utils::string_replace_all(relative_path, filename, pakFileName);
+                relativePath = Utils::string_replace_all(relativePath, fileName, pakFileName);
             }
 
-            std::string game_file = gamePath + "/" + relative_path;
-            modFiles[fileEntry.path().string()] = game_file;
+            std::string gameFile = gamePath + "/" + relativePath;
+            ModManagerData::File file;
+            file.SourcePath = fileEntry.path().string();
+            file.InstallPath = gameFile;
+            modFiles.push_back(file);
+            // modFiles[fileEntry.path().string()] = gameFile;
         }
     }
 
-    for (const auto &[modFile, gameFile] : modFiles.items())
+    for (const auto &file : modFiles)
     {
-        std::filesystem::create_directories(std::filesystem::path(gameFile.get<std::string>()).parent_path());
-        std::filesystem::copy_file(modFile, gameFile.get<std::string>(), std::filesystem::copy_options::overwrite_existing);
+        std::filesystem::create_directories(std::filesystem::path(file.InstallPath).parent_path());
+        std::filesystem::copy_file(file.SourcePath, file.InstallPath, std::filesystem::copy_options::overwrite_existing);
     }
 
-    nlohmann::json installedMod;
-    installedMod["SourcePath"] = modPath;
-    installedMod["Files"] = modFiles;
+    ModManagerData::Mod installedMod;
+    installedMod.SourcePath = modPath;
+    installedMod.Files = modFiles;
+    // nlohmann::json installedMod;
+    // installedMod["SourcePath"] = modPath;
+    // installedMod["Files"] = modFiles;
 
-    nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_installed.json");
+    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/" + "mods_installed.json"));
     modInstallations.push_back(installedMod);
-    JsonUtils::write_json_to_file(path + "/" + "mods_installed.json", modInstallations);
+    JsonUtils::write_json_to_file(path + "/" + "mods_installed.json", ModManagerData::mods_to_json(modInstallations));
+    // nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_installed.json");
+    // modInstallations.push_back(installedMod);
+    // JsonUtils::write_json_to_file(path + "/" + "mods_installed.json", modInstallations);
 
     return true;
 }
