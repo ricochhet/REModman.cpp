@@ -3,22 +3,25 @@
 
 #pragma once
 
-#include <json.hpp>
-#include <iostream>
-#include <fstream>
-#include <variant>
 #include <Logger.h>
 
-namespace JsonUtils
-{
-    nlohmann::json load_json(const std::string &path);
-    std::string get_string_value(const std::string &path, const std::vector<std::string> &keys);
-    std::string get_string_value(const nlohmann::json &j, const std::vector<std::string> &keys);
-    int get_integer_value(const std::string &path, const std::vector<std::string> &keys);
-    int get_integer_value(const nlohmann::json &j, const std::vector<std::string> &keys);
-    void write_json_to_file(const std::string &fileName, const nlohmann::json &data);
-    void write_empty_json_to_file(const std::string &path);
-    void create_or_update_json(const std::string &path, const std::vector<std::string> &keys, const std::variant<std::string, int> &value, bool update);
+#include <fstream>
+#include <iostream>
+#include <json.hpp>
+#include <variant>
+
+namespace JsonUtils {
+    nlohmann::json load_json(const std::string& path);
+    std::string    get_string_value(const std::string& path, const std::vector<std::string>& keys);
+    std::string    get_string_value(const nlohmann::json& j, const std::vector<std::string>& keys);
+    int            get_integer_value(const std::string& path, const std::vector<std::string>& keys);
+    int            get_integer_value(const nlohmann::json& j, const std::vector<std::string>& keys);
+    void           write_json_to_file(const std::string& fileName, const nlohmann::json& data);
+    void           write_empty_json_to_file(const std::string& path);
+    void           create_or_update_json(
+                  const std::string& path, const std::vector<std::string>& keys,
+                  const std::variant<std::string, int>& value, bool update
+              );
 }
 
-#endif // REMODMAN_JSONUTILS_INCLUDED
+#endif  // REMODMAN_JSONUTILS_INCLUDED

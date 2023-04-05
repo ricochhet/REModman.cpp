@@ -1,15 +1,13 @@
 #include <LuaBindings.h>
 
-int LuaBindings::logger(lua_State *L)
-{
-    const char *str = lua_tostring(L, 1);
+int LuaBindings::logger(lua_State* L) {
+    const char* str = lua_tostring(L, 1);
     Logger::getInstance().log(str, LogLevel::Warning);
     return 0;
 }
 
-int LuaBindings::create_lua_state()
-{
-    lua_State *L = luaL_newstate();
+int LuaBindings::create_lua_state() {
+    lua_State* L = luaL_newstate();
     luaL_openlibs(L);
     luaL_loadfilex(L, "script.lua", 0);
 
@@ -17,6 +15,6 @@ int LuaBindings::create_lua_state()
     lua_pushcfunction(L, chunk);
     lua_register(L, "logger", LuaBindings::logger);
     lua_call(L, 1, 0);
-    
+
     return 0;
 }

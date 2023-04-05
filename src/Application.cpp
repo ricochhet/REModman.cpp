@@ -1,8 +1,7 @@
 #include <ImGuiWindow.h>
 #include <Logger.h>
 
-void ImGuiWindow::setup_imgui_window()
-{
+void ImGuiWindow::setup_imgui_window() {
     REModman::draw_load_profile();
     REModman::draw_get_game_path();
     REModman::draw_game_selector();
@@ -13,10 +12,9 @@ void ImGuiWindow::setup_imgui_window()
     REModman::draw_installed_mod_list();
 }
 
-int main()
-{
+int main() {
     AllocConsole();
-    FILE *stream;
+    FILE* stream;
     freopen_s(&stream, "CONOUT$", "w", stdout);
     Logger::getInstance().setLogLevel(LogLevel::Error);
     Logger::getInstance().log("REModman Initialized.", LogLevel::OK);

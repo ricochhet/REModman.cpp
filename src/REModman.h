@@ -3,20 +3,18 @@
 
 #pragma once
 
-#include <imgui.h>
 #include <ImGuiFileDialog.h>
-#include <ModManager.h>
 #include <Logger.h>
+#include <ModManager.h>
 #include <RisePakPatch.h>
+#include <imgui.h>
 
-namespace FileDialog
-{
+namespace FileDialog {
     void draw_load_profile_dialog();
     void draw_get_game_path_dialog();
 }
 
-namespace REModman 
-{
+namespace REModman {
     void draw_load_profile();
     void draw_game_selector();
     void draw_get_game_path();
@@ -29,4 +27,4 @@ namespace REModman
     void reload_mod_entries();
 }
 
-#endif // REMODMAN_INCLUDED
+#endif  // REMODMAN_INCLUDED

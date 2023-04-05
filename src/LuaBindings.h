@@ -3,15 +3,15 @@
 
 #pragma once
 
-#include <imgui.h>
-#include <lua.hpp>
-#include <iostream>
 #include <Logger.h>
+#include <imgui.h>
 
-namespace LuaBindings
-{
+#include <iostream>
+#include <lua.hpp>
+
+namespace LuaBindings {
     int create_lua_state();
-    int logger(lua_State *L);
+    int logger(lua_State* L);
 }
 
-#endif // REMODMAN_LUABINDINGS_INCLUDED
+#endif  // REMODMAN_LUABINDINGS_INCLUDED

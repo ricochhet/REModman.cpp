@@ -3,32 +3,24 @@
 
 #pragma once
 
-#include <string>
 #include <iostream>
+#include <string>
 
-enum class LogLevel
-{
-    OK,
-    Debug,
-    Info,
-    Warning,
-    Error
-};
+enum class LogLevel { OK, Debug, Info, Warning, Error };
 
-class Logger
-{
+class Logger {
 public:
-    static Logger &getInstance();
-    void setLogLevel(LogLevel level);
-    int getColorCode(LogLevel level);
-    void log(const std::string &message, LogLevel level = LogLevel::Info);
+    static Logger& getInstance();
+    void           setLogLevel(LogLevel level);
+    int            getColorCode(LogLevel level);
+    void           log(const std::string& message, LogLevel level = LogLevel::Info);
 
 private:
     Logger();
-    Logger(const Logger &) = delete;
-    Logger &operator=(const Logger &) = delete;
+    Logger(const Logger&)            = delete;
+    Logger& operator=(const Logger&) = delete;
 
     LogLevel m_logLevel;
 };
 
-#endif // REMODMAN_LOGGER_INCLUDED
+#endif  // REMODMAN_LOGGER_INCLUDED
