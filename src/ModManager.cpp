@@ -78,7 +78,7 @@ std::vector<ModManagerData::File> ModManager::load_mod_files(
                 std::filesystem::relative(fileEntry.path(), modPath).string();
             std::string fileName = fileEntry.path().filename().string();
 
-            if (mhrPatchReEnginePak.isPak && gameSelection == "MonsterHunterRise") {
+            if (mhrPatchReEnginePak.isPak && gameSelection == GAME_MONSTER_HUNTER_RISE) {
                 std::string pakFileName =
                     "re_chunk_000.pak.patch_" +
                     std::to_string(mhrPatchReEnginePak.pakIndex)
@@ -235,7 +235,7 @@ bool ModManager::uninstall_pak_mod(
     std::vector<ModManagerData::Mod> pakModsToReinstall =
         ModManager::remove_mod_from_list(pakModInstallations, modPath);
 
-    if (gameSelection == "MonsterHunterRise") {
+    if (gameSelection == GAME_MONSTER_HUNTER_RISE) {
         ModManagerPatches::MonsterHunterRise::set_patch_in_profile(path, 2);
     }
 

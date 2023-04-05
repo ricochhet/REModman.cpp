@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <ModManagerDefinitions.h>
 #include <JsonUtils.h>
 
 #include <filesystem>

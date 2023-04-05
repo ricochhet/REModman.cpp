@@ -23,4 +23,12 @@
     #define MODS_INSTALLED_FILE_NAME "/mods_installed.json"
 #endif  // MODS_INSTALLED_FILE_NAME
 
+#ifndef GAME_NONE
+    #define GAME_NONE "None"
+#endif // GAME_NONE
+
+#ifndef GAME_MONSTER_HUNTER_RISE
+    #define GAME_MONSTER_HUNTER_RISE "MonsterHunterRise"
+#endif // GAME_MONSTER_HUNTER_RISE
+
 #endif  // REMODMAN_MANAGER_DEFINITIONS_INCLUDED
