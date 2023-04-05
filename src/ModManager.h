@@ -25,7 +25,6 @@ namespace ModManager
     bool install_mod(const std::string &path, const std::string &modPath, const std::string &gamePath, const std::string &gameSelection);
     bool uninstall_mod(const std::string &path, const std::string &modPath);
     bool uninstall_pak_mod(const std::string &path, const std::string &modPath, const std::string &gamePath, const std::string &gameSelection);
-    std::vector<nlohmann::json> remove_mod_from_list(const std::vector<nlohmann::json> &listToPatch, const std::string &modPath);
     std::vector<ModManagerData::Mod> remove_mod_from_list(const std::vector<ModManagerData::Mod> &listToPatch, const std::string &modPath);
     int get_last_selected_game(const std::string &path);
     std::string get_game_path(const std::string &path, const std::string &selection);

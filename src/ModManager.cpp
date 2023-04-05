@@ -38,7 +38,7 @@ std::vector<std::string> ModManager::get_available_mod_entries(const std::string
         throw;
     }
 
-    nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_installed.json");
+    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/" + "mods_installed.json"));
     std::vector<std::string> modEntries = get_mod_entries(path);
     std::vector<std::string> currentModEntries;
 
@@ -47,7 +47,7 @@ std::vector<std::string> ModManager::get_available_mod_entries(const std::string
         bool found = false;
         for (auto &installedMod : modInstallations)
         {
-            if (installedMod["SourcePath"] == entry)
+            if (installedMod.SourcePath == entry)
             {
                 found = true;
                 break;
@@ -350,31 +350,6 @@ bool ModManager::uninstall_pak_mod(const std::string &path, const std::string &m
     }
 
     return true;
-}
-
-std::vector<nlohmann::json> ModManager::remove_mod_from_list(const std::vector<nlohmann::json> &listToPatch, const std::string &modPath)
-{
-    if (!std::filesystem::exists(modPath))
-    {
-        Logger::getInstance().log("Mod path does not exist: " + modPath, LogLevel::Warning);
-        throw;
-    }
-
-    std::vector<nlohmann::json> modInstallations = listToPatch;
-
-    for (auto it = modInstallations.begin(); it != modInstallations.end();)
-    {
-        if ((*it)["SourcePath"] == modPath)
-        {
-            it = modInstallations.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
-
-    return modInstallations;
 }
 
 std::vector<ModManagerData::Mod> ModManager::remove_mod_from_list(const std::vector<ModManagerData::Mod> &listToPatch, const std::string &modPath)
