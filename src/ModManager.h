@@ -3,88 +3,14 @@
 
 #pragma once
 
-#include <iostream>
-#include <filesystem>
 #include <string>
 #include <vector>
-#include <JsonUtils.h>
 #include <Utils.h>
-
-namespace ModManagerData
-{
-    struct File
-    {
-        std::string SourcePath;
-        std::string InstallPath;
-    };
-
-    struct Mod
-    {
-        std::string SourcePath;
-        std::vector<File> Files;
-    };
-
-    nlohmann::json mod_to_json(const Mod &mod)
-    {
-        nlohmann::json j;
-        j["SourcePath"] = mod.SourcePath;
-        j["Files"] = nlohmann::json::array();
-
-        for (const auto &file : mod.Files)
-        {
-            nlohmann::json fileJson;
-            fileJson["SourcePath"] = file.SourcePath;
-            fileJson["InstallPath"] = file.InstallPath;
-            j["Files"].push_back(fileJson);
-        }
-
-        return j;
-    }
-
-    Mod mod_from_json(const nlohmann::json &j)
-    {
-        Mod mod;
-        mod.SourcePath = j["SourcePath"];
-        mod.Files.clear();
-
-        for (const auto &fileJson : j["Files"])
-        {
-            File file;
-            file.SourcePath = fileJson["SourcePath"];
-            file.InstallPath = fileJson["InstallPath"];
-
-            mod.Files.push_back(file);
-        }
-
-        return mod;
-    }
-
-    std::vector<Mod> mods_from_json(const nlohmann::json &j)
-    {
-        std::vector<Mod> mods;
-
-        for (const auto &mod : j)
-        {
-            mods.push_back(mod_from_json(mod));
-        }
-
-        return mods;
-    }
-}
-
-namespace ModManagerPatches
-{
-    namespace MonsterHunterRise
-    {
-        struct PatchReEnginePak
-        {
-            bool isPak;
-            int pakIndex;
-        };
-
-        PatchReEnginePak patch_re_engine_pak(const std::string &path, const std::string &modPath);
-    }
-}
+#include <iostream>
+#include <filesystem>
+#include <JsonUtils.h>
+#include <ModManagerData.h>
+#include <ModManagerPatches.h>
 
 namespace ModManager
 {

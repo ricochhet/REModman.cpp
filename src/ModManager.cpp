@@ -72,7 +72,6 @@ std::vector<std::string> ModManager::get_staged_mod_entries(const std::string &p
     }
 
     std::vector<ModManagerData::Mod> stagedMods = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/mods_staging.json"));
-    // nlohmann::json stagedMods = JsonUtils::load_json(path + "/mods_staging.json");
     std::vector<std::string> stagedModEntries;
 
     for (auto &entry : stagedMods)
@@ -137,7 +136,8 @@ bool ModManager::stage_mod(const std::string &path, const std::string &modPath, 
         return false;
     }
 
-    nlohmann::json modFiles;
+    std::vector<ModManagerData::File> modFiles;
+    // nlohmann::json modFiles;
 
     for (const auto &fileEntry : std::filesystem::recursive_directory_iterator(modPath))
     {
@@ -145,25 +145,36 @@ bool ModManager::stage_mod(const std::string &path, const std::string &modPath, 
         {
             std::string relative_path = std::filesystem::relative(fileEntry.path(), modPath).string();
             std::string filename = fileEntry.path().filename().string();
-            std::string game_file = gamePath + "/" + relative_path;
-            modFiles[fileEntry.path().string()] = game_file;
+            std::string gameFile = gamePath + "/" + relative_path;
+            
+            ModManagerData::File file;
+            file.SourcePath = fileEntry.path().string();
+            file.InstallPath = gameFile;
+            modFiles.push_back(file);
+            // modFiles[fileEntry.path().string()] = game_file;
         }
     }
 
-    nlohmann::json installedMod;
+    ModManagerData::Mod installedMod;
+    installedMod.SourcePath = modPath;
+    installedMod.Files = modFiles;
+    /*nlohmann::json installedMod;
     installedMod["SourcePath"] = modPath;
-    installedMod["Files"] = modFiles;
+    installedMod["Files"] = modFiles;*/
 
-    nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_staging.json");
+    std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + "/" + "mods_staging.json"));
+    // nlohmann::json modInstallations = JsonUtils::load_json(path + "/" + "mods_staging.json");
     size_t stagingIterator = stagingIndex;
     if (stagingIterator >= modInstallations.size())
     {
         stagingIterator = modInstallations.size();
     }
 
-    nlohmann::json::iterator stageIter = modInstallations.begin() + stagingIterator;
+    std::vector<ModManagerData::Mod>::iterator stageIter = modInstallations.begin() + stagingIterator;
     modInstallations.insert(stageIter, installedMod);
-    JsonUtils::write_json_to_file(path + "/" + "mods_staging.json", modInstallations);
+    // nlohmann::json::iterator stageIter = modInstallations.begin() + stagingIterator;
+    // modInstallations.insert(stageIter, installedMod);
+    JsonUtils::write_json_to_file(path + "/" + "mods_staging.json", ModManagerData::mods_to_json(modInstallations));
 
     return true;
 }
@@ -345,34 +356,6 @@ std::vector<nlohmann::json> ModManager::remove_mod_from_list(const std::vector<n
     }
 
     return modInstallations;
-}
-
-ModManagerPatches::MonsterHunterRise::PatchReEnginePak ModManagerPatches::MonsterHunterRise::patch_re_engine_pak(const std::string &path, const std::string &modPath)
-{
-    nlohmann::json j = JsonUtils::load_json(path + "/profile.json");
-    int pakModIndex = j["Patches"]["MonsterHunterRise"]["PatchReEnginePakIndex"];
-    bool isPakMod = false;
-
-    for (const auto &fileEntry : std::filesystem::directory_iterator(modPath))
-    {
-        if (fileEntry.is_regular_file())
-        {
-            std::string fileName = fileEntry.path().filename().string();
-
-            if (fileName.substr(fileName.find_last_of(".") + 1) == "pak")
-            {
-                isPakMod = true;
-                pakModIndex++;
-                JsonUtils::create_or_update_json(path + "/profile.json", {"Patches", "MonsterHunterRise", "PatchReEnginePakIndex"}, pakModIndex, true);
-                break;
-            }
-        }
-    }
-
-    ModManagerPatches::MonsterHunterRise::PatchReEnginePak pakInfo;
-    pakInfo.isPak = isPakMod;
-    pakInfo.pakIndex = pakModIndex;
-    return pakInfo;
 }
 
 int ModManager::get_last_selected_game(const std::string &path)
