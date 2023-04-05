@@ -14,4 +14,4 @@ namespace LuaBindings
     int logger(lua_State *L);
 }
 
-#endif REMODMAN_LUABINDINGS_INCLUDED
+#endif // REMODMAN_LUABINDINGS_INCLUDED
