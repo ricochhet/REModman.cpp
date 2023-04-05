@@ -1,11 +1,11 @@
 #include <ModManager.h>
 
 void ModManager::initialize(const std::string& path) {
-    Utils::create_directory(path + MODS_FOLDER);
-    Utils::create_directory(path + DOWNLOADS_FOLDER);
-    JsonUtils::write_empty_json_to_file(path + PROFILE_FILE_NAME);
-    JsonUtils::write_empty_json_to_file(path + MODS_STAGING_FILE_NAME);
-    JsonUtils::write_empty_json_to_file(path + MODS_INSTALLED_FILE_NAME);
+    Utils::create_directory(path + REMM_MODS_FOLDER);
+    Utils::create_directory(path + REMM_DOWNLOADS_FOLDER);
+    JsonUtils::write_empty_json_to_file(path + REMM_PROFILE_FILE_NAME);
+    JsonUtils::write_empty_json_to_file(path + REMM_MODS_STAGING_FILE_NAME);
+    JsonUtils::write_empty_json_to_file(path + REMM_MODS_INSTALLED_FILE_NAME);
 }
 
 std::vector<std::string> ModManager::get_mod_directories(const std::string& path) {
@@ -16,7 +16,7 @@ std::vector<std::string> ModManager::get_mod_directories(const std::string& path
 
     std::vector<std::string> modEntries;
 
-    for (const auto& fileEntry : std::filesystem::directory_iterator(path + MODS_FOLDER)) {
+    for (const auto& fileEntry : std::filesystem::directory_iterator(path + REMM_MODS_FOLDER)) {
         if (fileEntry.is_directory()) {
             modEntries.push_back(fileEntry.path().string());
         }
@@ -78,7 +78,7 @@ std::vector<ModManagerData::File> ModManager::load_mod_files(
                 std::filesystem::relative(fileEntry.path(), modPath).string();
             std::string fileName = fileEntry.path().filename().string();
 
-            if (mhrPatchReEnginePak.isPak && gameSelection == GAME_MONSTER_HUNTER_RISE) {
+            if (mhrPatchReEnginePak.isPak && gameSelection == REMM_GAME_MONSTER_HUNTER_RISE) {
                 std::string pakFileName =
                     "re_chunk_000.pak.patch_" +
                     std::to_string(mhrPatchReEnginePak.pakIndex)
@@ -115,7 +115,7 @@ bool ModManager::stage_mod(
     installedMod.Files      = modFiles;
 
     std::vector<ModManagerData::Mod> modInstallations =
-        ModManagerData::mods_from_json(JsonUtils::load_json(path + MODS_STAGING_FILE_NAME));
+        ModManagerData::mods_from_json(JsonUtils::load_json(path + REMM_MODS_STAGING_FILE_NAME));
     size_t stagingIterator = stagingIndex;
     if (stagingIterator >= modInstallations.size()) {
         stagingIterator = modInstallations.size();
@@ -125,7 +125,7 @@ bool ModManager::stage_mod(
         modInstallations.begin() + stagingIterator;
     modInstallations.insert(stageIter, installedMod);
     JsonUtils::write_json_to_file(
-        path + MODS_STAGING_FILE_NAME, ModManagerData::mods_to_json(modInstallations)
+        path + REMM_MODS_STAGING_FILE_NAME, ModManagerData::mods_to_json(modInstallations)
     );
 
     return true;
@@ -133,9 +133,9 @@ bool ModManager::stage_mod(
 
 bool ModManager::destage_mod(const std::string& path, const std::string& modPath) {
     std::vector<ModManagerData::Mod> j =
-        ModManagerData::mods_from_json(JsonUtils::load_json(path + MODS_STAGING_FILE_NAME));
+        ModManagerData::mods_from_json(JsonUtils::load_json(path + REMM_MODS_STAGING_FILE_NAME));
     j = ModManager::remove_mod_from_list(j, modPath);
-    JsonUtils::write_json_to_file(path + MODS_STAGING_FILE_NAME, ModManagerData::mods_to_json(j));
+    JsonUtils::write_json_to_file(path + REMM_MODS_STAGING_FILE_NAME, ModManagerData::mods_to_json(j));
 
     return true;
 }
@@ -163,10 +163,10 @@ bool ModManager::install_mod(
     installedMod.Files      = modFiles;
 
     std::vector<ModManagerData::Mod> modInstallations =
-        ModManagerData::mods_from_json(JsonUtils::load_json(path + MODS_INSTALLED_FILE_NAME));
+        ModManagerData::mods_from_json(JsonUtils::load_json(path + REMM_MODS_INSTALLED_FILE_NAME));
     modInstallations.push_back(installedMod);
     JsonUtils::write_json_to_file(
-        path + MODS_INSTALLED_FILE_NAME, ModManagerData::mods_to_json(modInstallations)
+        path + REMM_MODS_INSTALLED_FILE_NAME, ModManagerData::mods_to_json(modInstallations)
     );
 
     return true;
@@ -178,7 +178,7 @@ bool ModManager::uninstall_mod(const std::string& path, const std::string& modPa
     }
 
     std::vector<ModManagerData::Mod> modInstallations =
-        ModManagerData::mods_from_json(JsonUtils::load_json(path + MODS_INSTALLED_FILE_NAME));
+        ModManagerData::mods_from_json(JsonUtils::load_json(path + REMM_MODS_INSTALLED_FILE_NAME));
 
     for (const auto& installedMod : modInstallations) {
         if (installedMod.SourcePath == modPath) {
@@ -191,7 +191,7 @@ bool ModManager::uninstall_mod(const std::string& path, const std::string& modPa
             modInstallations =
                 ModManager::remove_mod_from_list(modInstallations, installedMod.SourcePath);
             JsonUtils::write_json_to_file(
-                path + MODS_INSTALLED_FILE_NAME, ModManagerData::mods_to_json(modInstallations)
+                path + REMM_MODS_INSTALLED_FILE_NAME, ModManagerData::mods_to_json(modInstallations)
             );
 
             return true;
@@ -211,7 +211,7 @@ bool ModManager::uninstall_pak_mod(
     }
 
     std::vector<ModManagerData::Mod> modInstallations =
-        ModManagerData::mods_from_json(JsonUtils::load_json(path + MODS_INSTALLED_FILE_NAME));
+        ModManagerData::mods_from_json(JsonUtils::load_json(path + REMM_MODS_INSTALLED_FILE_NAME));
     std::vector<ModManagerData::Mod> pakModInstallations;
 
     for (const auto& installedMod : modInstallations) {
@@ -235,7 +235,7 @@ bool ModManager::uninstall_pak_mod(
     std::vector<ModManagerData::Mod> pakModsToReinstall =
         ModManager::remove_mod_from_list(pakModInstallations, modPath);
 
-    if (gameSelection == GAME_MONSTER_HUNTER_RISE) {
+    if (gameSelection == REMM_GAME_MONSTER_HUNTER_RISE) {
         ModManagerPatches::MonsterHunterRise::set_patch_in_profile(path, 2);
     }
 

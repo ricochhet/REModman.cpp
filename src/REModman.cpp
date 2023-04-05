@@ -7,7 +7,7 @@ std::vector<std::string> staged_mod_entries;
 std::vector<std::string> available_mod_entries;
 std::vector<std::string> installed_mod_entries;
 
-std::vector<std::string> GameSelection = {GAME_NONE, GAME_MONSTER_HUNTER_RISE};
+std::vector<std::string> GameSelection = {REMM_GAME_NONE, REMM_GAME_MONSTER_HUNTER_RISE};
 
 std::string loadProfileDlgBtnLabel = "Create / Load Modding Profile";
 std::string getGameDlgBtnLabel     = "Find Game Location For ";
@@ -179,7 +179,7 @@ void REModman::draw_mod_list() {
                     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
                     ImGui::InputInt("##LoadOrder", &load_order);
                     if (std::filesystem::is_directory(sourcePath / "natives") &&
-                        GameSelection[game_selection_index] == GAME_MONSTER_HUNTER_RISE) {
+                        GameSelection[game_selection_index] == REMM_GAME_MONSTER_HUNTER_RISE) {
                         ImGui::Separator();
                         if (ImGui::Button("RisePakPatch", ImVec2(-1, 0))) {
                             std::filesystem::path outputPath =
@@ -258,7 +258,7 @@ void REModman::draw_mod_deploy_button() {
     if (!selected_profile_path.empty() && !selected_game_path.empty()) {
         if (ImGui::Button("Deploy", ImVec2(-1, 0))) {
             for (int i = 0; i < installed_mod_entries.size(); i++) {
-                if (GameSelection[game_selection_index] == GAME_MONSTER_HUNTER_RISE &&
+                if (GameSelection[game_selection_index] == REMM_GAME_MONSTER_HUNTER_RISE &&
                     ModManagerPatches::MonsterHunterRise::contains_pak_files(
                         installed_mod_entries[i]
                     )) {
@@ -317,7 +317,7 @@ void REModman::draw_installed_mod_list() {
                     ));
 
                     if (ImGui::Button("Uninstall", ImVec2(-1, 0))) {
-                        if (GameSelection[game_selection_index] == GAME_MONSTER_HUNTER_RISE &&
+                        if (GameSelection[game_selection_index] == REMM_GAME_MONSTER_HUNTER_RISE &&
                             ModManagerPatches::MonsterHunterRise::contains_pak_files(
                                 installed_mod_entries[i]
                             )) {
@@ -351,9 +351,9 @@ void REModman::draw_installed_mod_list() {
 
 void REModman::reload_mod_entries() {
     staged_mod_entries =
-        ModManager::get_mod_entries(selected_profile_path, MODS_STAGING_FILE_NAME, false);
+        ModManager::get_mod_entries(selected_profile_path, REMM_MODS_STAGING_FILE_NAME, false);
     available_mod_entries =
-        ModManager::get_mod_entries(selected_profile_path, MODS_INSTALLED_FILE_NAME, true);
+        ModManager::get_mod_entries(selected_profile_path, REMM_MODS_INSTALLED_FILE_NAME, true);
     installed_mod_entries =
-        ModManager::get_mod_entries(selected_profile_path, MODS_INSTALLED_FILE_NAME, false);
+        ModManager::get_mod_entries(selected_profile_path, REMM_MODS_INSTALLED_FILE_NAME, false);
 }

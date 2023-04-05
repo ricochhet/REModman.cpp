@@ -3,32 +3,32 @@
 
 #pragma once
 
-#ifndef MODS_FOLDER
-    #define MODS_FOLDER "/Mods/"
-#endif  // MODS_FOLDER
+#ifndef REMM_MODS_FOLDER
+    #define REMM_MODS_FOLDER "/Mods/"
+#endif  // REMM_MODS_FOLDER
 
-#ifndef DOWNLOADS_FOLDER
-    #define DOWNLOADS_FOLDER "/Downloads"
-#endif  // DOWNLOADS_FOLDER
+#ifndef REMM_DOWNLOADS_FOLDER
+    #define REMM_DOWNLOADS_FOLDER "/Downloads"
+#endif  // REMM_DOWNLOADS_FOLDER
 
-#ifndef PROFILE_FILE_NAME
-    #define PROFILE_FILE_NAME "/profile.json"
-#endif  // PROFILE_FILE_NAME
+#ifndef REMM_PROFILE_FILE_NAME
+    #define REMM_PROFILE_FILE_NAME "/profile.json"
+#endif  // REMM_PROFILE_FILE_NAME
 
-#ifndef MODS_STAGING_FILE_NAME
-    #define MODS_STAGING_FILE_NAME "/mods_staging.json"
-#endif  // MODS_STAGING_FILE_NAME
+#ifndef REMM_MODS_STAGING_FILE_NAME
+    #define REMM_MODS_STAGING_FILE_NAME "/mods_staging.json"
+#endif  // REMM_MODS_STAGING_FILE_NAME
 
-#ifndef MODS_INSTALLED_FILE_NAME
-    #define MODS_INSTALLED_FILE_NAME "/mods_installed.json"
-#endif  // MODS_INSTALLED_FILE_NAME
+#ifndef REMM_MODS_INSTALLED_FILE_NAME
+    #define REMM_MODS_INSTALLED_FILE_NAME "/mods_installed.json"
+#endif  // REMM_MODS_INSTALLED_FILE_NAME
 
-#ifndef GAME_NONE
-    #define GAME_NONE "None"
-#endif // GAME_NONE
+#ifndef REMM_GAME_NONE
+    #define REMM_GAME_NONE "None"
+#endif // REMM_GAME_NONE
 
-#ifndef GAME_MONSTER_HUNTER_RISE
-    #define GAME_MONSTER_HUNTER_RISE "MonsterHunterRise"
-#endif // GAME_MONSTER_HUNTER_RISE
+#ifndef REMM_GAME_MONSTER_HUNTER_RISE
+    #define REMM_GAME_MONSTER_HUNTER_RISE "MonsterHunterRise"
+#endif // REMM_GAME_MONSTER_HUNTER_RISE
 
 #endif  // REMODMAN_MANAGER_DEFINITIONS_INCLUDED

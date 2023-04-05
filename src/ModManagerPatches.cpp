@@ -4,8 +4,8 @@ ModManagerPatches::MonsterHunterRise::PatchReEnginePak
 ModManagerPatches::MonsterHunterRise::patch_re_engine_pak(
     const std::string& path, const std::string& modPath
 ) {
-    nlohmann::json j           = JsonUtils::load_json(path + PROFILE_FILE_NAME);
-    int            pakModIndex = j["Patches"][GAME_MONSTER_HUNTER_RISE]["PatchReEnginePakIndex"];
+    nlohmann::json j           = JsonUtils::load_json(path + REMM_PROFILE_FILE_NAME);
+    int            pakModIndex = j["Patches"][REMM_GAME_MONSTER_HUNTER_RISE]["PatchReEnginePakIndex"];
     bool           isPakMod    = false;
 
     for (const auto& fileEntry : std::filesystem::directory_iterator(modPath)) {
@@ -16,8 +16,8 @@ ModManagerPatches::MonsterHunterRise::patch_re_engine_pak(
                 isPakMod = true;
                 pakModIndex++;
                 JsonUtils::create_or_update_json(
-                    path + PROFILE_FILE_NAME,
-                    {"Patches", GAME_MONSTER_HUNTER_RISE, "PatchReEnginePakIndex"}, pakModIndex, true
+                    path + REMM_PROFILE_FILE_NAME,
+                    {"Patches", REMM_GAME_MONSTER_HUNTER_RISE, "PatchReEnginePakIndex"}, pakModIndex, true
                 );
                 break;
             }
@@ -56,7 +56,7 @@ void ModManagerPatches::MonsterHunterRise::set_patch_in_profile(
     const std::string& path, const int& index
 ) {
     JsonUtils::create_or_update_json(
-        path + PROFILE_FILE_NAME, {"Patches", GAME_MONSTER_HUNTER_RISE, "PatchReEnginePakIndex"},
+        path + REMM_PROFILE_FILE_NAME, {"Patches", REMM_GAME_MONSTER_HUNTER_RISE, "PatchReEnginePakIndex"},
         index, true
     );
 }
