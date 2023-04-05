@@ -270,7 +270,10 @@ void REModman::draw_mod_deploy_button() {
                     ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]);
                 }
 
-                ModManager::stage_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, GameSelection[game_selection_index], i);
+                ModManager::stage_mod(
+                    selected_profile_path, installed_mod_entries[i], selected_game_path,
+                    GameSelection[game_selection_index], i
+                );
             }
 
             reload_mod_entries();
