@@ -10,7 +10,7 @@ void ModManager::initialize(const std::string& path) {
 
 std::vector<std::string> ModManager::get_mod_directories(const std::string& path) {
     if (!std::filesystem::exists(path)) {
-        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
+        Logger::getInstance().log("File not found: " + path, LogLevel::Warning);
         return std::vector<std::string>();
     }
 
@@ -27,7 +27,7 @@ std::vector<std::string> ModManager::get_mod_directories(const std::string& path
 
 std::vector<std::string> ModManager::get_mod_entries(const std::string& path, const std::string& file, const bool compare) {
     if (!std::filesystem::exists(path)) {
-        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
+        Logger::getInstance().log("File not found: " + path, LogLevel::Warning);
         return std::vector<std::string>();
     }
 
@@ -40,6 +40,7 @@ std::vector<std::string> ModManager::get_mod_entries(const std::string& path, co
 
         for (const auto& entry : compareEntries) {
             bool found = false;
+            
             for (const auto& installedMod : modInstallations) {
                 if (installedMod.SourcePath == entry) {
                     found = true;
@@ -89,7 +90,7 @@ std::vector<ModManagerData::File> ModManager::load_mod_files(const std::string& 
 
 bool ModManager::stage_mod(const std::string& path, const std::string& modPath, const std::string& gamePath, const std::string& gameSelection, const int stagingIndex) {
     if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath) || !std::filesystem::exists(gamePath)) {
-        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
+        Logger::getInstance().log("File not found: " + path, LogLevel::Warning);
         return false;
     }
 
@@ -146,10 +147,6 @@ bool ModManager::install_mod(const std::string& path, const std::string& modPath
 }
 
 bool ModManager::uninstall_mod(const std::string& path, const std::string& modPath) {
-    if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath)) {
-        return false;
-    }
-
     std::vector<ModManagerData::Mod> modInstallations = ModManagerData::mods_from_json(JsonUtils::load_json(path + REMM_MODS_INSTALLED_FILE_NAME));
 
     for (const auto& installedMod : modInstallations) {
@@ -167,7 +164,7 @@ bool ModManager::uninstall_mod(const std::string& path, const std::string& modPa
         }
     }
 
-    Logger::getInstance().log("Mod installation not found.", LogLevel::Warning);
+    Logger::getInstance().log("Mod not found: " + modPath, LogLevel::Warning);
     return false;
 }
 
@@ -181,6 +178,7 @@ bool ModManager::uninstall_pak_mod(const std::string& path, const std::string& m
 
     for (const auto& installedMod : modInstallations) {
         bool IsPakMod = false;
+
         for (const auto& file : installedMod.Files) {
             if (file.SourcePath.substr(file.SourcePath.find_last_of(".") + 1) == "pak") {
                 IsPakMod = true;
@@ -212,7 +210,7 @@ bool ModManager::uninstall_pak_mod(const std::string& path, const std::string& m
 
 std::vector<ModManagerData::Mod> ModManager::remove_mod_from_list(const std::vector<ModManagerData::Mod>& listToPatch, const std::string& modPath) {
     if (!std::filesystem::exists(modPath)) {
-        Logger::getInstance().log("Mod path does not exist: " + modPath, LogLevel::Warning);
+        Logger::getInstance().log("File not found: " + modPath, LogLevel::Warning);
         return std::vector<ModManagerData::Mod>();
     }
 

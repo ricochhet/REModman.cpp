@@ -7,9 +7,7 @@ void ModManagerConfig::set_last_selected_game(const std::string& path, const int
 }
 
 int ModManagerConfig::get_last_selected_game(const std::string& path) {
-    int lastSelectedGameIndex = JsonUtils::get_integer_value(path + REMM_PROFILE_FILE_NAME, {REMM_CONF_LAST_SELECTED_GAME});
-    Logger::getInstance().log("Found profile path: " + path, LogLevel::Info);
-    return lastSelectedGameIndex;
+    return JsonUtils::get_integer_value(path + REMM_PROFILE_FILE_NAME, {REMM_CONF_LAST_SELECTED_GAME});
 }
 
 void ModManagerConfig::set_game_path(const std::string& path, const std::string& gameSelection, const std::string& pathSelection) {
@@ -17,12 +15,25 @@ void ModManagerConfig::set_game_path(const std::string& path, const std::string&
 }
 
 std::string ModManagerConfig::get_game_path(const std::string& path, const std::string& selection) {
-    std::string gamePath = JsonUtils::get_string_value(path + REMM_PROFILE_FILE_NAME, {REMM_CONF_GAMES, selection + REMM_CONF_GAME_PATH});
+    return JsonUtils::get_string_value(path + REMM_PROFILE_FILE_NAME, {REMM_CONF_GAMES, selection + REMM_CONF_GAME_PATH});
+}
 
-    if (!gamePath.empty()) {
-        Logger::getInstance().log("Found game path: " + path, LogLevel::Info);
-        return gamePath;
-    }
+std::vector<ModManagerData::Mod> ModManagerConfig::get_staged_mods(const std::string& path)
+{
+    return ModManagerData::mods_from_json(JsonUtils::get_json_value(path + REMM_PROFILE_FILE_NAME, {"StagedMods"}));
+}
 
-    return std::string();
+void ModManagerConfig::set_staged_mods(const std::string& path, const nlohmann::json& data)
+{
+    JsonUtils::create_or_update_json(path + REMM_PROFILE_FILE_NAME, {"StagedMods"}, data, true);
+}
+
+std::vector<ModManagerData::Mod> ModManagerConfig::get_installed_mods(const std::string& path)
+{
+    return ModManagerData::mods_from_json(JsonUtils::get_json_value(path + REMM_PROFILE_FILE_NAME, {"InstalledMods"}));
+}
+
+void ModManagerConfig::set_installed_mods(const std::string& path, const nlohmann::json& data)
+{
+    JsonUtils::create_or_update_json(path + REMM_PROFILE_FILE_NAME, {"InstalledMods"}, data, true);
 }

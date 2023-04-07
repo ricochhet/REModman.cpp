@@ -28,7 +28,7 @@ ModManagerPatches::MonsterHunterRise::PatchReEnginePak ModManagerPatches::Monste
 
 bool ModManagerPatches::MonsterHunterRise::contains_pak_files(const std::string& path) {
     if (!std::filesystem::exists(path)) {
-        Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
+        Logger::getInstance().log("File not found: " + path, LogLevel::Warning);
         return false;
     }
 
