@@ -11,7 +11,7 @@ void ModManager::initialize(const std::string& path) {
 std::vector<std::string> ModManager::get_mod_directories(const std::string& path) {
     if (!std::filesystem::exists(path)) {
         Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
-        throw;
+        return std::vector<std::string>();
     }
 
     std::vector<std::string> modEntries;
@@ -30,7 +30,7 @@ std::vector<std::string> ModManager::get_mod_entries(
 ) {
     if (!std::filesystem::exists(path)) {
         Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
-        throw;
+        return std::vector<std::string>();
     }
 
     std::vector<ModManagerData::Mod> modInstallations =
@@ -132,6 +132,11 @@ bool ModManager::stage_mod(
 }
 
 bool ModManager::destage_mod(const std::string& path, const std::string& modPath) {
+    if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath))
+    {
+        return false;
+    }
+
     std::vector<ModManagerData::Mod> j =
         ModManagerData::mods_from_json(JsonUtils::load_json(path + REMM_MODS_STAGING_FILE_NAME));
     j = ModManager::remove_mod_from_list(j, modPath);
@@ -201,14 +206,14 @@ bool ModManager::uninstall_mod(const std::string& path, const std::string& modPa
     }
 
     Logger::getInstance().log("Mod installation not found.", LogLevel::Warning);
-    throw std::runtime_error("Mod installation not found.");
+    return false;
 }
 
 bool ModManager::uninstall_pak_mod(
     const std::string& path, const std::string& modPath, const std::string& gamePath,
     const std::string& gameSelection
 ) {
-    if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath)) {
+    if (!std::filesystem::exists(path) || !std::filesystem::exists(modPath) || !std::filesystem::exists(gamePath)) {
         return false;
     }
 
@@ -253,7 +258,7 @@ std::vector<ModManagerData::Mod> ModManager::remove_mod_from_list(
 ) {
     if (!std::filesystem::exists(modPath)) {
         Logger::getInstance().log("Mod path does not exist: " + modPath, LogLevel::Warning);
-        throw;
+        return std::vector<ModManagerData::Mod>();
     }
 
     std::vector<ModManagerData::Mod> modInstallations = listToPatch;

@@ -36,23 +36,20 @@ ModManagerPatches::MonsterHunterRise::patch_re_engine_pak(
 bool ModManagerPatches::MonsterHunterRise::contains_pak_files(const std::string& path) {
     if (!std::filesystem::exists(path)) {
         Logger::getInstance().log("File path does not exist: " + path, LogLevel::Warning);
-        throw;
+        return false;
     }
-
-    bool isPakMod = false;
 
     for (const auto& fileEntry : std::filesystem::directory_iterator(path)) {
         if (fileEntry.is_regular_file()) {
             std::string fileName = fileEntry.path().filename().string();
 
             if (fileName.substr(fileName.find_last_of(".") + 1) == "pak") {
-                isPakMod = true;
-                break;
+                return true;
             }
         }
     }
 
-    return isPakMod;
+    return false;
 }
 
 void ModManagerPatches::MonsterHunterRise::set_patch_in_profile(
