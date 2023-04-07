@@ -2,25 +2,19 @@
 
 std::vector<char> read_all_bytes(const std::string& path) {
     std::ifstream     input_file(path, std::ios::binary);
-    std::vector<char> bytes(
-        (std::istreambuf_iterator<char>(input_file)), (std::istreambuf_iterator<char>())
-    );
+    std::vector<char> bytes((std::istreambuf_iterator<char>(input_file)), (std::istreambuf_iterator<char>()));
     return bytes;
 }
 
 std::string to_lower(const std::string& str) {
     std::string result = str;
-    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {
-        return std::tolower(c);
-    });
+    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) { return std::tolower(c); });
     return result;
 }
 
 std::string to_upper(const std::string& str) {
     std::string result = str;
-    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {
-        return std::toupper(c);
-    });
+    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) { return std::toupper(c); });
     return result;
 }
 
@@ -37,26 +31,19 @@ void RisePakPatch::ProcessDirectory(const std::string& path, const std::string& 
     }
 
     std::vector<std::string> sortedFiles;
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(
-             std::filesystem::path(directory) / "natives"
-         )) {
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(std::filesystem::path(directory) / "natives")) {
         if (std::filesystem::is_regular_file(entry)) {
             sortedFiles.emplace_back(entry.path().string());
         }
     }
-    std::sort(
-        sortedFiles.begin(), sortedFiles.end(),
-        [](const std::string& a, const std::string& b) {
-            if (std::filesystem::path(a).parent_path() == std::filesystem::path(b).parent_path()) {
-                return std::filesystem::path(a).filename() < std::filesystem::path(b).filename();
-            }
-            return std::filesystem::path(a).parent_path() < std::filesystem::path(b).parent_path();
+    std::sort(sortedFiles.begin(), sortedFiles.end(), [](const std::string& a, const std::string& b) {
+        if (std::filesystem::path(a).parent_path() == std::filesystem::path(b).parent_path()) {
+            return std::filesystem::path(a).filename() < std::filesystem::path(b).filename();
         }
-    );
+        return std::filesystem::path(a).parent_path() < std::filesystem::path(b).parent_path();
+    });
 
-    Logger::getInstance().log(
-        "Processing " + std::to_string(sortedFiles.size()) + " files", LogLevel::Info
-    );
+    Logger::getInstance().log("Processing " + std::to_string(sortedFiles.size()) + " files", LogLevel::Info);
     std::vector<FileEntry> list;
     Writer                 writer(outputFile);
     writer.WriteUInt32(1095454795u);
@@ -90,11 +77,7 @@ void RisePakPatch::ProcessDirectory(const std::string& path, const std::string& 
 
     writer.SeekFromBeginning(16);
     for (const FileEntry& item : list) {
-        Logger::getInstance().log(
-            item.fileName + " " + std::to_string(item.fileNameUpper) + " " +
-                std::to_string(item.fileNameLower),
-            LogLevel::Info
-        );
+        Logger::getInstance().log(item.fileName + " " + std::to_string(item.fileNameUpper) + " " + std::to_string(item.fileNameLower), LogLevel::Info);
         writer.WriteUInt32(item.fileNameLower);
         writer.WriteUInt32(item.fileNameUpper);
         writer.WriteUInt64(item.offset);

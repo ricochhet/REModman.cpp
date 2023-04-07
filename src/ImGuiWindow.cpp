@@ -5,15 +5,11 @@
 #include <ImGuiWindow.h>
 #include <stb_image.h>
 
-static void glfw_error_callback(int error, const char* description) {
-    std::cerr << "GLFW Error " << error << ": " << description << std::endl;
-}
+static void glfw_error_callback(int error, const char* description) { std::cerr << "GLFW Error " << error << ": " << description << std::endl; }
 
 void ImGuiWindow::setup_imgui_fonts(const ImGuiIO& io) {
     io.Fonts->Clear();
-    io.Fonts->AddFontFromMemoryCompressedTTF(
-        RobotoMedium_compressed_data, RobotoMedium_compressed_size, (float)16
-    );
+    io.Fonts->AddFontFromMemoryCompressedTTF(RobotoMedium_compressed_data, RobotoMedium_compressed_size, (float)16);
     io.Fonts->Build();
 }
 
@@ -120,10 +116,8 @@ int ImGuiWindow::create_imgui_window() {
         ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
         ImGui::SetNextWindowPos(ImVec2(0, 0));
 
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-                                        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-                                        ImGuiWindowFlags_NoBringToFrontOnFocus |
-                                        ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                                        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
         ImGui::Begin("Main", NULL, window_flags);
         ImGuiWindow::setup_imgui_window();
         ImGui::End();

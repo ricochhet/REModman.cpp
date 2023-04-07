@@ -9,12 +9,10 @@
 #include <iostream>
 
 namespace ModManagerConfig {
-    void set_selected_profile(const std::string& path);
-    void set_last_selected_game(const std::string& path, const int selection);
-    int  get_last_selected_game(const std::string& path);
-    void set_game_path(
-        const std::string& path, const std::string& gameSelection, const std::string& pathSelection
-    );
+    void        set_selected_profile(const std::string& path);
+    void        set_last_selected_game(const std::string& path, const int selection);
+    int         get_last_selected_game(const std::string& path);
+    void        set_game_path(const std::string& path, const std::string& gameSelection, const std::string& pathSelection);
     std::string get_game_path(const std::string& path, const std::string& selection);
 }
 

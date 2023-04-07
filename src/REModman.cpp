@@ -14,16 +14,11 @@ std::string getGameDlgBtnLabel     = "Find Game Location For ";
 
 void FileDialog::draw_load_profile_dialog() {
     if (ImGui::Button(loadProfileDlgBtnLabel.c_str(), ImVec2(-1, 0))) {
-        ImGuiFileDialog::Instance()->OpenDialog(
-            "LoadProfileDlgKey", "Choose Profile Folder", nullptr, "", 1, nullptr,
-            ImGuiFileDialogFlags_Modal
-        );
+        ImGuiFileDialog::Instance()->OpenDialog("LoadProfileDlgKey", "Choose Profile Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
     }
 
-    ImVec2 size =
-        ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
-    ImVec2 center =
-        ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
+    ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
+    ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
     ImGui::SetNextWindowSize(size);
     ImGui::SetNextWindowPos(ImVec2(center.x - (size.x * 0.5f), center.y - (size.y * 0.5f)));
     if (ImGuiFileDialog::Instance()->Display("LoadProfileDlgKey", 32)) {
@@ -37,18 +32,13 @@ void FileDialog::draw_load_profile_dialog() {
             REModman::reload_mod_entries();
 
             if (!selected_profile_path.empty()) {
-                game_selection_index =
-                    ModManagerConfig::get_last_selected_game(selected_profile_path);
-                selected_game_path = ModManagerConfig::get_game_path(
-                    selected_profile_path, GameSelection[game_selection_index]
-                );
-                loadProfileDlgBtnLabel =
-                    "(Profile) " + Utils::truncate_string(selected_profile_path, 256);
-                getGameDlgBtnLabel = getGameDlgBtnLabel + GameSelection[game_selection_index];
+                game_selection_index   = ModManagerConfig::get_last_selected_game(selected_profile_path);
+                selected_game_path     = ModManagerConfig::get_game_path(selected_profile_path, GameSelection[game_selection_index]);
+                loadProfileDlgBtnLabel = "(Profile) " + Utils::truncate_string(selected_profile_path, 256);
+                getGameDlgBtnLabel     = getGameDlgBtnLabel + GameSelection[game_selection_index];
 
                 if (!selected_game_path.empty()) {
-                    getGameDlgBtnLabel =
-                        "(Game Location) " + Utils::truncate_string(selected_game_path, 256);
+                    getGameDlgBtnLabel = "(Game Location) " + Utils::truncate_string(selected_game_path, 256);
                 }
             }
         }
@@ -59,37 +49,25 @@ void FileDialog::draw_load_profile_dialog() {
 
 void FileDialog::draw_get_game_path_dialog() {
     if (ImGui::Button(getGameDlgBtnLabel.c_str(), ImVec2(-1, 0))) {
-        ImGuiFileDialog::Instance()->OpenDialog(
-            "GetGameInstallDlgKey", "Choose Game Location", nullptr, "", 1, nullptr,
-            ImGuiFileDialogFlags_Modal
-        );
+        ImGuiFileDialog::Instance()->OpenDialog("GetGameInstallDlgKey", "Choose Game Location", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
     }
 
-    ImVec2 size =
-        ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
-    ImVec2 center =
-        ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
+    ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
+    ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
     ImGui::SetNextWindowSize(size);
     ImGui::SetNextWindowPos(ImVec2(center.x - (size.x * 0.5f), center.y - (size.y * 0.5f)));
     if (ImGuiFileDialog::Instance()->Display("GetGameInstallDlgKey", 32)) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
             std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            ModManagerConfig::set_game_path(
-                selected_profile_path, GameSelection[game_selection_index], filePathName
-            );
+            ModManagerConfig::set_game_path(selected_profile_path, GameSelection[game_selection_index], filePathName);
             selected_game_path = filePathName;
 
             if (!selected_game_path.empty()) {
-                getGameDlgBtnLabel =
-                    "(Game Location) " + Utils::truncate_string(selected_game_path, 256);
-                selected_game_path = ModManagerConfig::get_game_path(
-                    selected_profile_path, GameSelection[game_selection_index]
-                );
+                getGameDlgBtnLabel = "(Game Location) " + Utils::truncate_string(selected_game_path, 256);
+                selected_game_path = ModManagerConfig::get_game_path(selected_profile_path, GameSelection[game_selection_index]);
             }
 
-            Logger::getInstance().log(
-                "Found existing game path: " + selected_game_path, LogLevel::Info
-            );
+            Logger::getInstance().log("Found existing game path: " + selected_game_path, LogLevel::Info);
         }
 
         ImGuiFileDialog::Instance()->Close();
@@ -115,19 +93,12 @@ void REModman::draw_game_selector() {
                     game_selection_index = i;
                     ModManagerConfig::set_last_selected_game(selected_profile_path, i);
 
-                    if (ModManagerConfig::get_game_path(
-                            selected_profile_path, GameSelection[game_selection_index]
-                        )
-                            .empty()) {
+                    if (ModManagerConfig::get_game_path(selected_profile_path, GameSelection[game_selection_index]).empty()) {
                         selected_game_path = std::string();
-                        getGameDlgBtnLabel =
-                            "Find Game Location For " + GameSelection[game_selection_index];
+                        getGameDlgBtnLabel = "Find Game Location For " + GameSelection[game_selection_index];
                     } else {
-                        selected_game_path = ModManagerConfig::get_game_path(
-                            selected_profile_path, GameSelection[game_selection_index]
-                        );
-                        getGameDlgBtnLabel =
-                            "(Game Location) " + Utils::truncate_string(selected_game_path, 256);
+                        selected_game_path = ModManagerConfig::get_game_path(selected_profile_path, GameSelection[game_selection_index]);
+                        getGameDlgBtnLabel = "(Game Location) " + Utils::truncate_string(selected_game_path, 256);
                     }
                 }
 
@@ -159,37 +130,25 @@ void REModman::draw_mod_list() {
                 }
 
                 ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowSize().x * 0.5f, -1));
-                if (ImGui::BeginPopupModal(
-                        label.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize
-                    )) {
-                    ImGui::SetWindowPos(ImVec2(
-                        (ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2),
-                        (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2)
-                    ));
+                if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
+                    ImGui::SetWindowPos(
+                        ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2))
+                    );
 
                     if (ImGui::Button("Add", ImVec2(-1, 0))) {
-                        ModManager::stage_mod(
-                            selected_profile_path, available_mod_entries[i], selected_game_path,
-                            GameSelection[game_selection_index], load_order
-                        );
+                        ModManager::stage_mod(selected_profile_path, available_mod_entries[i], selected_game_path, GameSelection[game_selection_index], load_order);
                         reload_mod_entries();
                         ImGui::CloseCurrentPopup();
                     }
 
                     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
                     ImGui::InputInt("##LoadOrder", &load_order);
-                    if (std::filesystem::is_directory(sourcePath / "natives") &&
-                        GameSelection[game_selection_index] == REMM_GAME_MONSTER_HUNTER_RISE) {
+                    if (std::filesystem::is_directory(sourcePath / "natives") && GameSelection[game_selection_index] == REMM_GAME_MONSTER_HUNTER_RISE) {
                         ImGui::Separator();
                         if (ImGui::Button("RisePakPatch", ImVec2(-1, 0))) {
-                            std::filesystem::path outputPath =
-                                sourcePath.string() + " Pak Version/" +
-                                (sourcePath.filename().string() + ".pak");
+                            std::filesystem::path outputPath = sourcePath.string() + " Pak Version/" + (sourcePath.filename().string() + ".pak");
                             Utils::create_directory(outputPath.parent_path());
-                            RisePakPatch::ProcessDirectory(
-                                sourcePath.string(), sourcePath.string() + " Pak Version/" +
-                                                         (sourcePath.filename().string() + ".pak")
-                            );
+                            RisePakPatch::ProcessDirectory(sourcePath.string(), sourcePath.string() + " Pak Version/" + (sourcePath.filename().string() + ".pak"));
                             reload_mod_entries();
                             ImGui::CloseCurrentPopup();
                         }
@@ -226,13 +185,10 @@ void REModman::draw_staging_mod_list() {
                 }
 
                 ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowSize().x * 0.5f, -1));
-                if (ImGui::BeginPopupModal(
-                        label.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize
-                    )) {
-                    ImGui::SetWindowPos(ImVec2(
-                        (ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2),
-                        (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2)
-                    ));
+                if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
+                    ImGui::SetWindowPos(
+                        ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2))
+                    );
 
                     if (ImGui::Button("Remove", ImVec2(-1, 0))) {
                         ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]);
@@ -258,31 +214,19 @@ void REModman::draw_mod_deploy_button() {
     if (!selected_profile_path.empty() && !selected_game_path.empty()) {
         if (ImGui::Button("Deploy", ImVec2(-1, 0))) {
             for (int i = 0; i < installed_mod_entries.size(); i++) {
-                if (GameSelection[game_selection_index] == REMM_GAME_MONSTER_HUNTER_RISE &&
-                    ModManagerPatches::MonsterHunterRise::contains_pak_files(
-                        installed_mod_entries[i]
-                    )) {
-                    ModManager::uninstall_pak_mod(
-                        selected_profile_path, installed_mod_entries[i], selected_game_path,
-                        GameSelection[game_selection_index]
-                    );
+                if (GameSelection[game_selection_index] == REMM_GAME_MONSTER_HUNTER_RISE && ModManagerPatches::MonsterHunterRise::contains_pak_files(installed_mod_entries[i])) {
+                    ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, GameSelection[game_selection_index]);
                 } else {
                     ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]);
                 }
 
-                ModManager::stage_mod(
-                    selected_profile_path, installed_mod_entries[i], selected_game_path,
-                    GameSelection[game_selection_index], i
-                );
+                ModManager::stage_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, GameSelection[game_selection_index], i);
             }
 
             reload_mod_entries();
 
             for (int i = 0; i < staged_mod_entries.size(); i++) {
-                ModManager::install_mod(
-                    selected_profile_path, staged_mod_entries[i], selected_game_path,
-                    GameSelection[game_selection_index]
-                );
+                ModManager::install_mod(selected_profile_path, staged_mod_entries[i], selected_game_path, GameSelection[game_selection_index]);
                 ModManager::destage_mod(selected_profile_path, staged_mod_entries[i]);
             }
         }
@@ -308,27 +252,17 @@ void REModman::draw_installed_mod_list() {
                 }
 
                 ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowSize().x * 0.5f, -1));
-                if (ImGui::BeginPopupModal(
-                        label.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize
-                    )) {
-                    ImGui::SetWindowPos(ImVec2(
-                        (ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2),
-                        (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2)
-                    ));
+                if (ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
+                    ImGui::SetWindowPos(
+                        ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2))
+                    );
 
                     if (ImGui::Button("Uninstall", ImVec2(-1, 0))) {
                         if (GameSelection[game_selection_index] == REMM_GAME_MONSTER_HUNTER_RISE &&
-                            ModManagerPatches::MonsterHunterRise::contains_pak_files(
-                                installed_mod_entries[i]
-                            )) {
-                            ModManager::uninstall_pak_mod(
-                                selected_profile_path, installed_mod_entries[i], selected_game_path,
-                                GameSelection[game_selection_index]
-                            );
+                            ModManagerPatches::MonsterHunterRise::contains_pak_files(installed_mod_entries[i])) {
+                            ModManager::uninstall_pak_mod(selected_profile_path, installed_mod_entries[i], selected_game_path, GameSelection[game_selection_index]);
                         } else {
-                            ModManager::uninstall_mod(
-                                selected_profile_path, installed_mod_entries[i]
-                            );
+                            ModManager::uninstall_mod(selected_profile_path, installed_mod_entries[i]);
                         }
 
                         reload_mod_entries();
@@ -350,10 +284,7 @@ void REModman::draw_installed_mod_list() {
 }
 
 void REModman::reload_mod_entries() {
-    staged_mod_entries =
-        ModManager::get_mod_entries(selected_profile_path, REMM_MODS_STAGING_FILE_NAME, false);
-    available_mod_entries =
-        ModManager::get_mod_entries(selected_profile_path, REMM_MODS_INSTALLED_FILE_NAME, true);
-    installed_mod_entries =
-        ModManager::get_mod_entries(selected_profile_path, REMM_MODS_INSTALLED_FILE_NAME, false);
+    staged_mod_entries    = ModManager::get_mod_entries(selected_profile_path, REMM_MODS_STAGING_FILE_NAME, false);
+    available_mod_entries = ModManager::get_mod_entries(selected_profile_path, REMM_MODS_INSTALLED_FILE_NAME, true);
+    installed_mod_entries = ModManager::get_mod_entries(selected_profile_path, REMM_MODS_INSTALLED_FILE_NAME, false);
 }

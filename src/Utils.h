@@ -6,10 +6,7 @@
 #include <iostream>
 
 namespace Utils {
-    std::string string_replace_all(
-        const std::string& baseString, const std::string& stringToReplace,
-        const std::string& replacement
-    );
+    std::string string_replace_all(const std::string& baseString, const std::string& stringToReplace, const std::string& replacement);
     std::string truncate_string(const std::string& baseString, const int truncateAtLength);
     bool        create_directory(const std::filesystem::path& path);
 }

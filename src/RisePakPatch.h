@@ -25,12 +25,8 @@ class Writer {
 public:
     Writer(std::string fileName) { outStream.open(fileName, std::ios::binary); }
     ~Writer() { outStream.close(); }
-    void WriteUInt32(uint32_t value) {
-        outStream.write(reinterpret_cast<const char*>(&value), sizeof(value));
-    }
-    void WriteUInt64(uint64_t value) {
-        outStream.write(reinterpret_cast<const char*>(&value), sizeof(value));
-    }
+    void WriteUInt32(uint32_t value) { outStream.write(reinterpret_cast<const char*>(&value), sizeof(value)); }
+    void WriteUInt64(uint64_t value) { outStream.write(reinterpret_cast<const char*>(&value), sizeof(value)); }
     void Write(const char* data, std::streamsize count) { outStream.write(data, count); }
     void Seek(std::streampos position) { outStream.seekp(position); }
     void SeekFromBeginning(std::size_t position) { outStream.seekp(position, std::ios_base::beg); }
