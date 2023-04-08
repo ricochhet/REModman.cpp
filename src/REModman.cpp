@@ -84,7 +84,9 @@ void REModman::drawGameSelector() {
                     if (ManagerImpl::getInstance().getSelectedGamePath().empty()) {
                         getGameDlgBtnLabel = "Find Game Location For " + GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()];
                     } else {
-                        ManagerImpl::getInstance().setSelectedGamePath(ManagerImpl::getInstance().getSelectedGamePath(), GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]);
+                        ManagerImpl::getInstance().setSelectedGamePath(
+                            ManagerImpl::getInstance().getSelectedGamePath(), GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]
+                        );
                         getGameDlgBtnLabel = "(Game Location) " + Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256);
                     }
                 }

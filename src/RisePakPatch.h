@@ -21,7 +21,7 @@ namespace RisePakPatch {
         uint64_t    offset;
         uint64_t    uncompSize;
     };
-    
+
     void processDirectory(const std::string& path, const std::string& outputFile);
 }
 

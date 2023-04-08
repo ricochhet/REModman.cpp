@@ -319,13 +319,13 @@ void ManagerImpl::doInstallMod(const std::string& modPath) {
         return Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
     }
 
-    std::vector<File> modFiles             = getModFiles(modPath, true);
+    std::vector<File> modFiles = getModFiles(modPath, true);
     for (const auto& file : modFiles) {
         std::filesystem::create_directories(std::filesystem::path(file.InstallPath).parent_path());
         std::filesystem::copy_file(file.SourcePath, file.InstallPath, std::filesystem::copy_options::overwrite_existing);
     }
 
-    std::vector<Mod>  currentInstalledMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["InstalledMods"]);
+    std::vector<Mod> currentInstalledMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["InstalledMods"]);
     currentInstalledMods.push_back(createMod(modPath, modFiles));
     JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"InstalledMods"}, allModsToJson(currentInstalledMods), true);
 }
