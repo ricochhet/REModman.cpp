@@ -259,7 +259,6 @@ std::vector<std::string> ManagerImpl::getModEntries(const std::string& key, cons
 
     return modsToReturn;
 }
-
 std::vector<ManagerImpl::File> ManagerImpl::getModFiles(const std::string& modPath, const bool& doPatch) {
     std::vector<File> modFiles;
 
@@ -268,10 +267,10 @@ std::vector<ManagerImpl::File> ManagerImpl::getModFiles(const std::string& modPa
         genericPakPatch = patchPak(modPath);
     }
 
-    for (const auto& fileEntry : std::filesystem::recursive_directory_iterator(modPath)) {
-        if (fileEntry.is_regular_file()) {
-            std::string relativePath = std::filesystem::relative(fileEntry.path(), modPath).string();
-            std::string fileName     = fileEntry.path().filename().string();
+    for (const auto& path : std::filesystem::recursive_directory_iterator(modPath)) {
+        if (path.is_regular_file()) {
+            std::string relativePath = std::filesystem::relative(path.path(), modPath).string();
+            std::string fileName     = path.path().filename().string();
 
             if (genericPakPatch.isPakMod && m_SelectedGameName == "MonsterHunterRise" && doPatch) {
                 std::string pakFileName =
@@ -279,7 +278,7 @@ std::vector<ManagerImpl::File> ManagerImpl::getModFiles(const std::string& modPa
                 relativePath = Utils::replaceAllInString(relativePath, fileName, pakFileName);
             }
 
-            modFiles.push_back(createFile(fileEntry.path().string(), m_SelectedGamePath + "/" + relativePath));
+            modFiles.push_back(createFile(path.path().string(), m_SelectedGamePath + "/" + relativePath));
         }
     }
 
