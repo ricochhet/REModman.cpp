@@ -1,4 +1,5 @@
 #include <ImGuiWindow.h>
+#include <REModman.h>
 
 void ImGuiWindow::setupImGuiWindow() {
     REModman::drawLoadProfile();
@@ -12,9 +13,6 @@ void ImGuiWindow::setupImGuiWindow() {
 }
 
 int main() {
-    AllocConsole();
-    FILE* stream;
-    freopen_s(&stream, "CONOUT$", "w", stdout);
     Logger::getInstance().setLogLevel(LogLevel::Error);
     Logger::getInstance().log("REModman Initialized.", LogLevel::OK);
     ImGuiWindow::createImGuiWindow("REModman", "remodman-icon-1024.png", "remodman_ui.ini");
