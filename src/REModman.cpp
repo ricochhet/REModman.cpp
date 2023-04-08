@@ -20,8 +20,12 @@ void FileDialog::draw_load_profile_dialog() {
             ManagerImpl::getInstance().setCurrentWorkingDirectory(filePathName);
             ManagerImpl::getInstance().patchConfig(2);
             ManagerImpl::getInstance().doSetupChecks();
+            ManagerImpl::getInstance().refreshModEntries();
 
             if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty()) {
+                ManagerImpl::getInstance().setSelectedGameIndex();
+                ManagerImpl::getInstance().setSelectedGamePath("", GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]);
+
                 loadProfileDlgBtnLabel = "(Profile) " + Utils::truncate_string(ManagerImpl::getInstance().getCurrentWorkingDirectory(), 256);
                 getGameDlgBtnLabel     = getGameDlgBtnLabel + GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()];
 
@@ -75,11 +79,12 @@ void REModman::draw_game_selector() {
                 bool isSelected = (ManagerImpl::getInstance().getSelectedGameIndex() == i);
                 if (ImGui::Selectable(GameSelection[i].c_str(), isSelected)) {
                     ManagerImpl::getInstance().setSelectedGameIndex(i);
+                    ManagerImpl::getInstance().setSelectedGamePath("", GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]);
 
                     if (ManagerImpl::getInstance().getSelectedGamePath().empty()) {
-                        ManagerImpl::getInstance().setSelectedGamePath(std::string(), GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]);
                         getGameDlgBtnLabel = "Find Game Location For " + GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()];
                     } else {
+                        ManagerImpl::getInstance().setSelectedGamePath(ManagerImpl::getInstance().getSelectedGamePath(), GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]);
                         getGameDlgBtnLabel = "(Game Location) " + Utils::truncate_string(ManagerImpl::getInstance().getSelectedGamePath(), 256);
                     }
                 }
@@ -241,7 +246,7 @@ void REModman::draw_installed_mod_list() {
                     );
 
                     if (ImGui::Button("Uninstall", ImVec2(-1, 0))) {
-                        if (GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()] == "MonsterhunterRise" &&
+                        if (GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()] == "MonsterHunterRise" &&
                             ManagerImpl::getInstance().containsPakFiles(ManagerImpl::getInstance().getInstalledModEntries()[i])) {
                             ManagerImpl::getInstance().doUninstallPak(ManagerImpl::getInstance().getInstalledModEntries()[i]);
                         } else {

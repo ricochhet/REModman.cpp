@@ -23,6 +23,7 @@ public:
 
     void setCurrentWorkingDirectory(const std::string& path);
     void setSelectedGameIndex(const int& index);
+    void setSelectedGameIndex();
     void setSelectedGamePath(const std::string& path, const std::string& selectedGameName);
 
     //----------------------------------
