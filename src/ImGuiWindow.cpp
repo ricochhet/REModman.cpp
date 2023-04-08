@@ -5,15 +5,15 @@
 #include <ImGuiWindow.h>
 #include <stb_image.h>
 
-static void glfw_error_callback(int error, const char* description) { std::cerr << "GLFW Error " << error << ": " << description << std::endl; }
+static void glfwErrorCallback(int error, const char* description) { std::cerr << "GLFW Error " << error << ": " << description << std::endl; }
 
-void ImGuiWindow::setup_imgui_fonts(const ImGuiIO& io) {
+void ImGuiWindow::setupImGuiFont(const ImGuiIO& io) {
     io.Fonts->Clear();
     io.Fonts->AddFontFromMemoryCompressedTTF(RobotoMedium_compressed_data, RobotoMedium_compressed_size, (float)16);
     io.Fonts->Build();
 }
 
-void ImGuiWindow::setup_imgui_style() {
+void ImGuiWindow::setupImGuiStyle() {
     ImGui::StyleColorsDark();
 
     auto& style             = ImGui::GetStyle();
@@ -73,21 +73,21 @@ void ImGuiWindow::setup_imgui_style() {
     colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.25f, 0.2505f, 0.251f, 1.0f};
 }
 
-int ImGuiWindow::create_imgui_window() {
+int ImGuiWindow::createImGuiWindow(const char* title, const char* iconFileName, const char* iniFileName) {
     // Setup window
-    glfwSetErrorCallback(glfw_error_callback);
+    glfwSetErrorCallback(glfwErrorCallback);
     if (!glfwInit()) {
         return 1;
     }
 
-    GLFWwindow* window = glfwCreateWindow(800, 650, "REModman", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 650, title, NULL, NULL);
     if (!window) {
         glfwTerminate();
         return 1;
     }
 
     GLFWimage icon[1];
-    icon[0].pixels = stbi_load("remodman-icon-1024.png", &icon[0].width, &icon[0].height, 0, 4);
+    icon[0].pixels = stbi_load(iconFileName, &icon[0].width, &icon[0].height, 0, 4);
     glfwSetWindowIcon(window, 1, icon);
     stbi_image_free(icon[0].pixels);
 
@@ -97,12 +97,12 @@ int ImGuiWindow::create_imgui_window() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    setup_imgui_fonts(io);
+    setupImGuiFont(io);
     (void)io;
-    ImGui::GetIO().IniFilename = "remodman_ui.ini";
+    ImGui::GetIO().IniFilename = iniFileName;
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
-    setup_imgui_style();
+    setupImGuiStyle();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -119,7 +119,7 @@ int ImGuiWindow::create_imgui_window() {
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                                         ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
         ImGui::Begin("Main", NULL, window_flags);
-        ImGuiWindow::setup_imgui_window();
+        ImGuiWindow::setupImGuiWindow();
         ImGui::End();
 
         ImGui::Render();

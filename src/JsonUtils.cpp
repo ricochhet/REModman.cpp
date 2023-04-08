@@ -2,7 +2,7 @@
 
 void log_json(const nlohmann::json& j) { Logger::getInstance().log(j.dump(4), LogLevel::Info); }
 
-nlohmann::json JsonUtils::load_json(const std::string& path) {
+nlohmann::json JsonUtils::loadJson(const std::string& path) {
     std::ifstream fileIn(path);
 
     if (fileIn.good()) {
@@ -15,7 +15,7 @@ nlohmann::json JsonUtils::load_json(const std::string& path) {
     }
 }
 
-void JsonUtils::write_json_to_file(const std::string& fileName, const nlohmann::json& data) {
+void JsonUtils::writeJson(const std::string& fileName, const nlohmann::json& data) {
     std::ofstream fileOut(fileName);
     if (fileOut.is_open()) {
         nlohmann::json j = data;
@@ -26,7 +26,7 @@ void JsonUtils::write_json_to_file(const std::string& fileName, const nlohmann::
     }
 }
 
-void JsonUtils::write_empty_json_to_file(const std::string& path) {
+void JsonUtils::writeJson(const std::string& path) {
     std::ifstream fileIn(path);
 
     if (!fileIn.good()) {
@@ -37,8 +37,8 @@ void JsonUtils::write_empty_json_to_file(const std::string& path) {
     }
 }
 
-std::string JsonUtils::get_string_value(const std::string& path, const std::vector<std::string>& keys) {
-    nlohmann::json obj = load_json(path);
+std::string JsonUtils::getString(const std::string& path, const std::vector<std::string>& keys) {
+    nlohmann::json obj = loadJson(path);
     for (const auto& key : keys) {
         if (obj.contains(key)) {
             obj = obj[key];
@@ -51,7 +51,7 @@ std::string JsonUtils::get_string_value(const std::string& path, const std::vect
     return obj.get<std::string>();
 }
 
-std::string JsonUtils::get_string_value(const nlohmann::json& j, const std::vector<std::string>& keys) {
+std::string JsonUtils::getString(const nlohmann::json& j, const std::vector<std::string>& keys) {
     nlohmann::json obj = j;
     for (const auto& key : keys) {
         if (obj.contains(key)) {
@@ -65,8 +65,8 @@ std::string JsonUtils::get_string_value(const nlohmann::json& j, const std::vect
     return obj.get<std::string>();
 }
 
-int JsonUtils::get_integer_value(const std::string& path, const std::vector<std::string>& keys) {
-    nlohmann::json obj = load_json(path);
+int JsonUtils::getInt(const std::string& path, const std::vector<std::string>& keys) {
+    nlohmann::json obj = loadJson(path);
     for (const auto& key : keys) {
         if (obj.contains(key)) {
             obj = obj[key];
@@ -79,7 +79,7 @@ int JsonUtils::get_integer_value(const std::string& path, const std::vector<std:
     return obj.get<int>();
 }
 
-int JsonUtils::get_integer_value(const nlohmann::json& j, const std::vector<std::string>& keys) {
+int JsonUtils::getInt(const nlohmann::json& j, const std::vector<std::string>& keys) {
     nlohmann::json obj = j;
     for (const auto& key : keys) {
         if (obj.contains(key)) {
@@ -93,9 +93,8 @@ int JsonUtils::get_integer_value(const nlohmann::json& j, const std::vector<std:
     return obj.get<int>();
 }
 
-nlohmann::json JsonUtils::get_json_value(const std::string& path, const std::vector<std::string>& keys)
-{
-    nlohmann::json obj = load_json(path);
+nlohmann::json JsonUtils::getJson(const std::string& path, const std::vector<std::string>& keys) {
+    nlohmann::json obj = loadJson(path);
     for (const auto& key : keys) {
         if (obj.contains(key)) {
             obj = obj[key];
@@ -108,8 +107,7 @@ nlohmann::json JsonUtils::get_json_value(const std::string& path, const std::vec
     return obj.get<nlohmann::json>();
 }
 
-nlohmann::json JsonUtils::get_json_value(const nlohmann::json& j, const std::vector<std::string>& keys)
-{
+nlohmann::json JsonUtils::getJson(const nlohmann::json& j, const std::vector<std::string>& keys) {
     nlohmann::json obj = j;
     for (const auto& key : keys) {
         if (obj.contains(key)) {
@@ -123,7 +121,7 @@ nlohmann::json JsonUtils::get_json_value(const nlohmann::json& j, const std::vec
     return obj.get<nlohmann::json>();
 }
 
-void JsonUtils::create_or_update_json(const std::string& path, const std::vector<std::string>& keys, const std::variant<std::string, int, nlohmann::json>& value, bool update) {
+void JsonUtils::updateJson(const std::string& path, const std::vector<std::string>& keys, const std::variant<std::string, int, nlohmann::json>& value, bool update) {
     std::ifstream fileIn(path);
 
     if (fileIn.good()) {

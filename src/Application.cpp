@@ -1,15 +1,14 @@
 #include <ImGuiWindow.h>
-#include <Logger.h>
 
-void ImGuiWindow::setup_imgui_window() {
-    REModman::draw_load_profile();
-    REModman::draw_get_game_path();
-    REModman::draw_game_selector();
+void ImGuiWindow::setupImGuiWindow() {
+    REModman::drawLoadProfile();
+    REModman::drawGetGamePath();
+    REModman::drawGameSelector();
 
-    REModman::draw_mod_list();
-    REModman::draw_staging_mod_list();
-    REModman::draw_mod_deploy_button();
-    REModman::draw_installed_mod_list();
+    REModman::drawAvailableModList();
+    REModman::drawStagedModList();
+    REModman::drawDeployButton();
+    REModman::drawInstalledModList();
 }
 
 int main() {
@@ -18,5 +17,5 @@ int main() {
     freopen_s(&stream, "CONOUT$", "w", stdout);
     Logger::getInstance().setLogLevel(LogLevel::Error);
     Logger::getInstance().log("REModman Initialized.", LogLevel::OK);
-    ImGuiWindow::create_imgui_window();
+    ImGuiWindow::createImGuiWindow("REModman", "remodman-icon-1024.png", "remodman_ui.ini");
 }

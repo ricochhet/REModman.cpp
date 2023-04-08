@@ -15,10 +15,10 @@
 #include <iostream>
 
 namespace ImGuiWindow {
-    int  create_imgui_window();
-    void setup_imgui_fonts(const ImGuiIO& io);
-    void setup_imgui_style();
-    void setup_imgui_window();
+    int  createImGuiWindow(const char* title, const char* iconFileName, const char* iniFileName);
+    void setupImGuiFont(const ImGuiIO& io);
+    void setupImGuiStyle();
+    void setupImGuiWindow();
 }
 
 #endif  // REMODMAN_IMGUIWINDOW_INCLUDED

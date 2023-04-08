@@ -95,32 +95,32 @@ nlohmann::json ManagerImpl::allModsToJson(const std::vector<Mod>& mods) {
 //----------------------------------
 void ManagerImpl::setCurrentWorkingDirectory(const std::string& path) {
     m_CurrentWorkingDirectory = path;
-    JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"SelectedProfile"}, m_CurrentWorkingDirectory, true);
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"SelectedProfile"}, m_CurrentWorkingDirectory, true);
 }
 
 void ManagerImpl::setSelectedGameIndex(const int& index) {
     if (!m_CurrentWorkingDirectory.empty()) {
-        JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"LastSelectedGame"}, index, true);
-        int value           = JsonUtils::get_integer_value(m_CurrentWorkingDirectory + "/profile.json", {"LastSelectedGame"});
+        JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"LastSelectedGame"}, index, true);
+        int value           = JsonUtils::getInt(m_CurrentWorkingDirectory + "/profile.json", {"LastSelectedGame"});
         m_SelectedGameIndex = value;
     }
 }
 
 void ManagerImpl::setSelectedGameIndex() {
-    int value           = JsonUtils::get_integer_value(m_CurrentWorkingDirectory + "/profile.json", {"LastSelectedGame"});
+    int value           = JsonUtils::getInt(m_CurrentWorkingDirectory + "/profile.json", {"LastSelectedGame"});
     m_SelectedGameIndex = value;
 }
 
 void ManagerImpl::setSelectedGamePath(const std::string& path, const std::string& selectedGameName) {
     if (!m_CurrentWorkingDirectory.empty()) {
-        std::string value  = JsonUtils::get_string_value(m_CurrentWorkingDirectory + "/profile.json", {"Games", selectedGameName});
+        std::string value  = JsonUtils::getString(m_CurrentWorkingDirectory + "/profile.json", {"Games", selectedGameName});
         m_SelectedGameName = selectedGameName;
 
         if (!value.empty()) {
             m_SelectedGamePath = value;
         } else if (value.empty() && !path.empty()) {
             m_SelectedGamePath = path;
-            JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"Games", selectedGameName}, m_SelectedGamePath, true);
+            JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"Games", selectedGameName}, m_SelectedGamePath, true);
         }
     }
 }
@@ -142,7 +142,7 @@ ManagerImpl::GenericPakPatch ManagerImpl::createGenericPakPatch(const bool& isPa
 }
 
 ManagerImpl::GenericPakPatch ManagerImpl::patchPak(const std::string& modPath) {
-    int  pakPatchIndex = JsonUtils::get_integer_value(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"});
+    int  pakPatchIndex = JsonUtils::getInt(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"});
     bool isPakMod      = false;
     for (const auto& file : std::filesystem::directory_iterator(modPath)) {
         if (file.is_regular_file()) {
@@ -152,7 +152,7 @@ ManagerImpl::GenericPakPatch ManagerImpl::patchPak(const std::string& modPath) {
                 isPakMod = true;
                 pakPatchIndex++;
 
-                JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"}, pakPatchIndex, true);
+                JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"}, pakPatchIndex, true);
                 break;
             }
         }
@@ -181,7 +181,7 @@ bool ManagerImpl::containsPakFiles(const std::string& modPath) {
 }
 
 void ManagerImpl::patchConfig(const int& pakPatchIndex) {
-    JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"}, pakPatchIndex, true);
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"}, pakPatchIndex, true);
 }
 
 //----------------------------------
@@ -200,12 +200,12 @@ void ManagerImpl::setStagedModEntries() { m_StagedModEntries = getModEntries("St
 void ManagerImpl::setInstalledModEntries() { m_InstalledModEntries = getModEntries("InstalledMods", false); }
 
 void ManagerImpl::doSetupChecks() {
-    Utils::create_directory(m_CurrentWorkingDirectory + "/Mods/");
-    Utils::create_directory(m_CurrentWorkingDirectory + "/Downloads/");
+    Utils::createDirectory(m_CurrentWorkingDirectory + "/Mods/");
+    Utils::createDirectory(m_CurrentWorkingDirectory + "/Downloads/");
 
-    JsonUtils::write_empty_json_to_file(m_CurrentWorkingDirectory + "/profile.json");
-    JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"StagedMods"}, nlohmann::json::array(), false);
-    JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"InstalledMods"}, nlohmann::json::array(), false);
+    JsonUtils::writeJson(m_CurrentWorkingDirectory + "/profile.json");
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"StagedMods"}, nlohmann::json::array(), false);
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"InstalledMods"}, nlohmann::json::array(), false);
 }
 
 std::vector<std::string> ManagerImpl::getModDirectories() {
@@ -230,7 +230,7 @@ std::vector<std::string> ManagerImpl::getModEntries(const std::string& key, cons
         return std::vector<std::string>();
     }
 
-    std::vector<Mod>         installedMods = allJsonToMods(JsonUtils::load_json(m_CurrentWorkingDirectory + "/profile.json")[key]);
+    std::vector<Mod>         installedMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")[key]);
     std::vector<std::string> compareDirectories;
     std::vector<std::string> modsToReturn;
 
@@ -276,7 +276,7 @@ std::vector<ManagerImpl::File> ManagerImpl::getModFiles(const std::string& modPa
             if (genericPakPatch.isPakMod && m_SelectedGameName == "MonsterHunterRise" && doPatch) {
                 std::string pakFileName =
                     "re_chunk_000.pak.patch_" + std::to_string(genericPakPatch.pakPatchIndex).insert(0, 3 - std::to_string(genericPakPatch.pakPatchIndex).length(), '0') + ".pak";
-                relativePath = Utils::string_replace_all(relativePath, fileName, pakFileName);
+                relativePath = Utils::replaceAllInString(relativePath, fileName, pakFileName);
             }
 
             modFiles.push_back(createFile(fileEntry.path().string(), m_SelectedGamePath + "/" + relativePath));
@@ -293,7 +293,7 @@ void ManagerImpl::doStageMod(const std::string& modPath, const int& stageIndex) 
 
     std::vector<File> modFiles          = getModFiles(modPath, false);
     Mod               modToStage        = createMod(modPath, modFiles);
-    std::vector<Mod>  currentStagedMods = allJsonToMods(JsonUtils::load_json(m_CurrentWorkingDirectory + "/profile.json")["StagedMods"]);
+    std::vector<Mod>  currentStagedMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["StagedMods"]);
     size_t            stageIndexSizeT;
     if (stageIndexSizeT >= currentStagedMods.size()) {
         stageIndexSizeT = currentStagedMods.size();
@@ -301,7 +301,7 @@ void ManagerImpl::doStageMod(const std::string& modPath, const int& stageIndex) 
 
     std::vector<Mod>::iterator iterator = currentStagedMods.begin() + stageIndexSizeT;
     currentStagedMods.insert(iterator, modToStage);
-    JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"StagedMods"}, allModsToJson(currentStagedMods), true);
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"StagedMods"}, allModsToJson(currentStagedMods), true);
 }
 
 void ManagerImpl::doUnstageMod(const std::string& modPath) {
@@ -309,9 +309,9 @@ void ManagerImpl::doUnstageMod(const std::string& modPath) {
         return Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
     }
 
-    std::vector<Mod> currentStagedMods = allJsonToMods(JsonUtils::load_json(m_CurrentWorkingDirectory + "/profile.json")["StagedMods"]);
+    std::vector<Mod> currentStagedMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["StagedMods"]);
     currentStagedMods                  = removeModFromList(currentStagedMods, modPath);
-    JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"StagedMods"}, allModsToJson(currentStagedMods), true);
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"StagedMods"}, allModsToJson(currentStagedMods), true);
 }
 
 void ManagerImpl::doInstallMod(const std::string& modPath) {
@@ -325,13 +325,13 @@ void ManagerImpl::doInstallMod(const std::string& modPath) {
         std::filesystem::copy_file(file.SourcePath, file.InstallPath, std::filesystem::copy_options::overwrite_existing);
     }
 
-    std::vector<Mod>  currentInstalledMods = allJsonToMods(JsonUtils::load_json(m_CurrentWorkingDirectory + "/profile.json")["InstalledMods"]);
+    std::vector<Mod>  currentInstalledMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["InstalledMods"]);
     currentInstalledMods.push_back(createMod(modPath, modFiles));
-    JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"InstalledMods"}, allModsToJson(currentInstalledMods), true);
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"InstalledMods"}, allModsToJson(currentInstalledMods), true);
 }
 
 void ManagerImpl::doUninstallMod(const std::string& modPath) {
-    std::vector<Mod> currentInstalledMods = allJsonToMods(JsonUtils::load_json(m_CurrentWorkingDirectory + "/profile.json")["InstalledMods"]);
+    std::vector<Mod> currentInstalledMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["InstalledMods"]);
 
     for (const auto& installedMod : currentInstalledMods) {
         if (installedMod.SourcePath == modPath) {
@@ -342,7 +342,7 @@ void ManagerImpl::doUninstallMod(const std::string& modPath) {
             }
 
             currentInstalledMods = removeModFromList(currentInstalledMods, installedMod.SourcePath);
-            JsonUtils::create_or_update_json(m_CurrentWorkingDirectory + "/profile.json", {"InstalledMods"}, allModsToJson(currentInstalledMods), true);
+            JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"InstalledMods"}, allModsToJson(currentInstalledMods), true);
             break;
         }
     }
@@ -353,7 +353,7 @@ void ManagerImpl::doUninstallPak(const std::string& modPath) {
         return Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
     }
 
-    std::vector<Mod> currentInstalledMods = allJsonToMods(JsonUtils::load_json(m_CurrentWorkingDirectory + "/profile.json")["InstalledMods"]);
+    std::vector<Mod> currentInstalledMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["InstalledMods"]);
     std::vector<Mod> paksToUninstall;
 
     for (const auto& installedMod : currentInstalledMods) {
