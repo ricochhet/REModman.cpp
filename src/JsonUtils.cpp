@@ -1,7 +1,5 @@
 #include <JsonUtils.h>
 
-void log_json(const nlohmann::json& j) { Logger::getInstance().log(j.dump(4), LogLevel::Info); }
-
 nlohmann::json JsonUtils::loadJson(const std::string& path) {
     std::ifstream fileIn(path);
 
