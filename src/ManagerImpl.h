@@ -21,15 +21,22 @@ public:
 
     std::string getSelectedGamePath() { return m_SelectedGamePath; }
 
-    void setCurrentWorkingDirectory(const std::string& path);
-    void setSelectedGameIndex(const int& index);
-    void setSelectedGameIndex();
-    void setSelectedGamePath(const std::string& path, const std::string& selectedGameName);
+    bool getHandlePakPatching() { return m_HandlePakPatching; }
+
+    void setGameSelectionItems(const std::vector<std::string>& items) { m_GameSelectionItems = items; }
+
+    void                     setCurrentWorkingDirectory(const std::string& path);
+    void                     setSelectedGameIndex(const int& index);
+    void                     setSelectedGameIndex();
+    void                     setSelectedGamePath(const std::string& path, const std::string& selectedGameName);
+    void                     setHandlePakPatching(const bool& valu);
+    void                     setHandlePakPatching();
+    std::vector<std::string> getGameSelectionItems() { return m_GameSelectionItems; }
 
     //----------------------------------
     // [SECTION] Patch implementation
     //----------------------------------
-    void patchConfig(const int& pakPatchIndex);
+    void patchConfig(const int& pakPatchIndex, const bool& update);
     bool containsPakFiles(const std::string& modPath);
 
     //----------------------------------
@@ -69,10 +76,12 @@ private:
     //----------------------------------
     // [SECTION] Config implementation
     //----------------------------------
-    std::string m_CurrentWorkingDirectory;
-    int         m_SelectedGameIndex;
-    std::string m_SelectedGamePath;
-    std::string m_SelectedGameName;
+    std::string              m_CurrentWorkingDirectory;
+    int                      m_SelectedGameIndex;
+    std::string              m_SelectedGamePath;
+    std::string              m_SelectedGameName;
+    bool                     m_HandlePakPatching;
+    std::vector<std::string> m_GameSelectionItems;
 
     //----------------------------------
     // [SECTION] Patch implementation

@@ -125,6 +125,19 @@ void ManagerImpl::setSelectedGamePath(const std::string& path, const std::string
     }
 }
 
+void ManagerImpl::setHandlePakPatching(const bool& val) {
+    if (!m_CurrentWorkingDirectory.empty()) {
+        JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"HandlePakPatching"}, val, true);
+        bool value          = JsonUtils::getBool(m_CurrentWorkingDirectory + "/profile.json", {"HandlePakPatching"});
+        m_HandlePakPatching = value;
+    }
+}
+
+void ManagerImpl::setHandlePakPatching() {
+    bool value          = JsonUtils::getBool(m_CurrentWorkingDirectory + "/profile.json", {"HandlePakPatching"});
+    m_HandlePakPatching = value;
+}
+
 //----------------------------------
 // [SECTION] Patch implementation
 //----------------------------------
@@ -180,8 +193,8 @@ bool ManagerImpl::containsPakFiles(const std::string& modPath) {
     return false;
 }
 
-void ManagerImpl::patchConfig(const int& pakPatchIndex) {
-    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"}, pakPatchIndex, true);
+void ManagerImpl::patchConfig(const int& pakPatchIndex, const bool& update) {
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"}, pakPatchIndex, update);
 }
 
 //----------------------------------
@@ -204,6 +217,7 @@ void ManagerImpl::doSetupChecks() {
     Utils::createDirectory(m_CurrentWorkingDirectory + "/Downloads/");
 
     JsonUtils::writeJson(m_CurrentWorkingDirectory + "/profile.json");
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"HandlePakPatching"}, false, false);
     JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"StagedMods"}, nlohmann::json::array(), false);
     JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"InstalledMods"}, nlohmann::json::array(), false);
 }
@@ -371,7 +385,7 @@ void ManagerImpl::doUninstallPak(const std::string& modPath) {
     std::vector<Mod> paksToInstall = removeModFromList(paksToUninstall, modPath);
 
     if (m_SelectedGameName == "MonsterHunterRise") {
-        patchConfig(2);
+        patchConfig(2, true);
     }
 
     for (const auto& pakToReinstall : paksToInstall) {
