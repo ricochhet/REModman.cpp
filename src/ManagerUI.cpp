@@ -76,9 +76,7 @@ void ManagerUI::drawGamePathFileDlg() {
 
         ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowSize().x * 0.5f, -1));
         if (ImGui::BeginPopupModal(m_SettingsLabel.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
-            ImGui::SetWindowPos(
-                ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2))
-            );
+            ImGui::SetWindowPos(ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2)));
             m_HandlePakPatchingCheckBox = ManagerImpl::getInstance().getHandlePakPatching();
             if (ImGui::Checkbox("Handle Pak Patching", &m_HandlePakPatchingCheckBox)) {
                 ManagerImpl::getInstance().setHandlePakPatching(m_HandlePakPatchingCheckBox);
