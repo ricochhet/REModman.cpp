@@ -21,12 +21,6 @@ public:
 
     std::string getSelectedGamePath() { return m_SelectedGamePath; }
 
-    void addDefaultGameFolder();
-    void addGameFolder(const std::string& path);
-    void removeGameFolder(const std::string& path);
-    void setGameFolders();
-    std::vector<std::string> getGameFolders() { return m_GameFolders; };
-
     void setCurrentWorkingDirectory(const std::string& path);
     void setSelectedGameIndex(const int& index);
     void setSelectedGameIndex();
@@ -75,7 +69,6 @@ private:
     //----------------------------------
     // [SECTION] Config implementation
     //----------------------------------
-    std::vector<std::string> m_GameFolders;
     std::string m_CurrentWorkingDirectory;
     int         m_SelectedGameIndex;
     std::string m_SelectedGamePath;

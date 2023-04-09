@@ -16,8 +16,6 @@ namespace FileDialog {
 
 namespace REModman {
     void drawLoadProfile();
-    void drawContextSelector();
-    void drawAddGameFolderDlg();
     void drawGetGamePath();
     void drawGameSelector();
 

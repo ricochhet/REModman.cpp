@@ -3,14 +3,13 @@
 
 void ImGuiWindow::setupImGuiWindow() {
     REModman::drawLoadProfile();
-    REModman::drawContextSelector();
-    // REModman::drawGetGamePath();
-    // REModman::drawGameSelector();
+    REModman::drawGetGamePath();
+    REModman::drawGameSelector();
 
-    // REModman::drawAvailableModList();
-    // REModman::drawStagedModList();
-    // REModman::drawDeployButton();
-    // REModman::drawInstalledModList();
+    REModman::drawAvailableModList();
+    REModman::drawStagedModList();
+    REModman::drawDeployButton();
+    REModman::drawInstalledModList();
 }
 
 int main() {
