@@ -24,6 +24,8 @@ public:
 
     void setGamePathFileDlgLabel(const std::string& label) { m_GamePathFileDlgLabel = label; }
 
+    void setSettingsLabel(const std::string& label) { m_SettingsLabel = label; }
+
     void setProfileFileDlgKey(const std::string& label) { m_ProfileFileDlgKey = label; }
 
     void setGamePathFileDlgKey(const std::string& label) { m_GamePathFileDlgKey = label; }
@@ -32,6 +34,7 @@ public:
 
     std::string getProfileFileDlgLabel() { return m_ProfileFileDlgLabel; }
     std::string getGamePathFileDlgLabel() { return m_GamePathFileDlgLabel; }
+    std::string getSettingsLabel() { return m_SettingsLabel; }
 
     std::string getProfileFileDlgKey() { return m_ProfileFileDlgKey; }
     std::string getGamePathFileDlgKey() { return m_GamePathFileDlgKey; }
@@ -42,9 +45,7 @@ public:
     void setupVars();
 
     void drawProfileFileDlg();
-    void drawProfileFileDlgCtx();
     void drawGamePathFileDlg();
-    void drawGamePathFileDlgCtx();
 
     void drawAvailableMods();
     void drawStagedMods();
@@ -63,9 +64,12 @@ private:
 
     std::string m_ProfileFileDlgLabel;
     std::string m_GamePathFileDlgLabel;
+    std::string m_SettingsLabel;
 
     std::string m_ProfileFileDlgKey;
     std::string m_GamePathFileDlgKey;
+
+    bool m_HandlePakPatchingCheckBox;
 };
 
 #endif  // REMODMAN_UI_INCLUDED

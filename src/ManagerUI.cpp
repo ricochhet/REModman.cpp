@@ -8,12 +8,13 @@ ManagerUI& ManagerUI::getInstance() {
 void ManagerUI::setupVars() {
     setProfileFileDlgLabel("Create or load a modding profile");
     setGamePathFileDlgLabel("Find a game installation path");
+    setSettingsLabel("Settings");
 
     setProfileFileDlgKey("##ProfileFileDlgKey");
     setGamePathFileDlgKey("##GamePathFileDlgKey");
 }
 
-void ManagerUI::drawProfileFileDlgCtx() {
+void ManagerUI::drawProfileFileDlg() {
     if (ImGui::Button(m_ProfileFileDlgLabel.c_str(), ImVec2(-1, 0))) {
         ImGuiFileDialog::Instance()->OpenDialog(m_ProfileFileDlgKey, "Choose Profile Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
     }
@@ -45,35 +46,49 @@ void ManagerUI::drawProfileFileDlgCtx() {
     }
 }
 
-void ManagerUI::drawProfileFileDlg() { drawProfileFileDlgCtx(); }
-
-void ManagerUI::drawGamePathFileDlgCtx() {
-    if (ImGui::Button(m_GamePathFileDlgLabel.c_str(), ImVec2(-1, 0))) {
-        ImGuiFileDialog::Instance()->OpenDialog(m_GamePathFileDlgKey, "Choose Game Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
-    }
-
-    ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
-    ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
-
-    if (ImGuiFileDialog::Instance()->Display(m_GamePathFileDlgKey, 32, size, size, ImVec2(center.x - (size.x * 0.5f), center.y - (size.y * 0.5f)))) {
-        if (ImGuiFileDialog::Instance()->IsOk()) {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            ManagerImpl::getInstance().setSelectedGamePath(filePathName);
-
-            if (!ManagerImpl::getInstance().getSelectedGamePath().empty()) {
-                setGamePathFileDlgLabel(std::format("Game Context - {}", Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256)));
-            } else {
-                setGamePathFileDlgLabel("Find a game installation path");
-            }
-        }
-
-        ImGuiFileDialog::Instance()->Close();
-    }
-}
-
 void ManagerUI::drawGamePathFileDlg() {
     if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty()) {
-        drawGamePathFileDlgCtx();
+        if (ImGui::Button(m_GamePathFileDlgLabel.c_str(), ImVec2(ImGui::GetWindowSize().x * 0.5f, 0))) {
+            ImGuiFileDialog::Instance()->OpenDialog(m_GamePathFileDlgKey, "Choose Game Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
+        }
+
+        ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
+        ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
+
+        if (ImGuiFileDialog::Instance()->Display(m_GamePathFileDlgKey, 32, size, size, ImVec2(center.x - (size.x * 0.5f), center.y - (size.y * 0.5f)))) {
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                ManagerImpl::getInstance().setSelectedGamePath(filePathName);
+
+                if (!ManagerImpl::getInstance().getSelectedGamePath().empty()) {
+                    setGamePathFileDlgLabel(std::format("Game Context - {}", Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256)));
+                } else {
+                    setGamePathFileDlgLabel("Find a game installation path");
+                }
+            }
+
+            ImGuiFileDialog::Instance()->Close();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(m_SettingsLabel.c_str(), ImVec2(ImGui::GetWindowSize().x * 0.5f, 0))) {
+            ImGui::OpenPopup(m_SettingsLabel.c_str());
+        }
+
+        ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowSize().x * 0.5f, -1));
+        if (ImGui::BeginPopupModal(m_SettingsLabel.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
+            ImGui::SetWindowPos(
+                ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2))
+            );
+            m_HandlePakPatchingCheckBox = ManagerImpl::getInstance().getHandlePakPatching();
+            if (ImGui::Checkbox("Handle Pak Patching", &m_HandlePakPatchingCheckBox)) {
+                ManagerImpl::getInstance().setHandlePakPatching(m_HandlePakPatchingCheckBox);
+            }
+            ImGui::Separator();
+            if (ImGui::Button("Exit", ImVec2(-1, 0))) {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
     }
 }
 

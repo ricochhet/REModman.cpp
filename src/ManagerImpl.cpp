@@ -141,7 +141,7 @@ ManagerImpl::GenericPakPatch ManagerImpl::createGenericPakPatch(const bool& isPa
 }
 
 ManagerImpl::GenericPakPatch ManagerImpl::patchPak(const std::string& modPath) {
-    int  pakPatchIndex = JsonUtils::getInt(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"});
+    int  pakPatchIndex = JsonUtils::getInt(m_CurrentWorkingDirectory + "/profile.json", {"PakPatchIndex"});
     bool isPakMod      = false;
     for (const auto& file : std::filesystem::directory_iterator(modPath)) {
         if (file.is_regular_file()) {
@@ -151,7 +151,7 @@ ManagerImpl::GenericPakPatch ManagerImpl::patchPak(const std::string& modPath) {
                 isPakMod = true;
                 pakPatchIndex++;
 
-                JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"}, pakPatchIndex, true);
+                JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"PakPatchIndex"}, pakPatchIndex, true);
                 break;
             }
         }
@@ -180,7 +180,7 @@ bool ManagerImpl::containsPakFiles(const std::string& modPath) {
 }
 
 void ManagerImpl::patchConfig(const int& pakPatchIndex, const bool& update) {
-    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"Patches", "MonsterHunterRise", "PatchPakIndex"}, pakPatchIndex, update);
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"PakPatchIndex"}, pakPatchIndex, update);
 }
 
 //----------------------------------
@@ -272,7 +272,7 @@ std::vector<ManagerImpl::File> ManagerImpl::getModFiles(const std::string& modPa
             std::string relativePath = std::filesystem::relative(path.path(), modPath).string();
             std::string fileName     = path.path().filename().string();
 
-            if (genericPakPatch.isPakMod && m_SelectedGameName == "MonsterHunterRise" && doPatch) {
+            if (genericPakPatch.isPakMod && m_HandlePakPatching && doPatch) {
                 std::string pakFileName =
                     "re_chunk_000.pak.patch_" + std::to_string(genericPakPatch.pakPatchIndex).insert(0, 3 - std::to_string(genericPakPatch.pakPatchIndex).length(), '0') + ".pak";
                 relativePath = Utils::replaceAllInString(relativePath, fileName, pakFileName);
@@ -370,7 +370,7 @@ void ManagerImpl::doUninstallPak(const std::string& modPath) {
 
     std::vector<Mod> paksToInstall = removeModFromList(paksToUninstall, modPath);
 
-    if (m_SelectedGameName == "MonsterHunterRise") {
+    if (m_HandlePakPatching) {
         patchConfig(2, true);
     }
 
