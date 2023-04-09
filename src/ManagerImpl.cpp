@@ -111,17 +111,17 @@ void ManagerImpl::setSelectedGamePath() {
     m_SelectedGamePath = value;
 }
 
-void ManagerImpl::setHandlePakPatching(const bool& val) {
+void ManagerImpl::setHandleNumericalPaks(const bool& val) {
     if (!m_CurrentWorkingDirectory.empty()) {
-        JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"HandlePakPatching"}, val, true);
-        bool value          = JsonUtils::getBool(m_CurrentWorkingDirectory + "/profile.json", {"HandlePakPatching"});
-        m_HandlePakPatching = value;
+        JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"HandleNumericalPaks"}, val, true);
+        bool value          = JsonUtils::getBool(m_CurrentWorkingDirectory + "/profile.json", {"HandleNumericalPaks"});
+        m_HandleNumericalPaks = value;
     }
 }
 
-void ManagerImpl::setHandlePakPatching() {
-    bool value          = JsonUtils::getBool(m_CurrentWorkingDirectory + "/profile.json", {"HandlePakPatching"});
-    m_HandlePakPatching = value;
+void ManagerImpl::setHandleNumericalPaks() {
+    bool value          = JsonUtils::getBool(m_CurrentWorkingDirectory + "/profile.json", {"HandleNumericalPaks"});
+    m_HandleNumericalPaks = value;
 }
 
 //----------------------------------
@@ -203,7 +203,7 @@ void ManagerImpl::doSetupChecks() {
     Utils::createDirectory(m_CurrentWorkingDirectory + "/Downloads/");
 
     JsonUtils::writeJson(m_CurrentWorkingDirectory + "/profile.json");
-    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"HandlePakPatching"}, false, false);
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"HandleNumericalPaks"}, false, false);
     JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"StagedMods"}, nlohmann::json::array(), false);
     JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"InstalledMods"}, nlohmann::json::array(), false);
 }
@@ -272,7 +272,7 @@ std::vector<ManagerImpl::File> ManagerImpl::getModFiles(const std::string& modPa
             std::string relativePath = std::filesystem::relative(path.path(), modPath).string();
             std::string fileName     = path.path().filename().string();
 
-            if (genericPakPatch.isPakMod && m_HandlePakPatching && doPatch) {
+            if (genericPakPatch.isPakMod && m_HandleNumericalPaks && doPatch) {
                 std::string pakFileName =
                     "re_chunk_000.pak.patch_" + std::to_string(genericPakPatch.pakPatchIndex).insert(0, 3 - std::to_string(genericPakPatch.pakPatchIndex).length(), '0') + ".pak";
                 relativePath = Utils::replaceAllInString(relativePath, fileName, pakFileName);
@@ -370,7 +370,7 @@ void ManagerImpl::doUninstallPak(const std::string& modPath) {
 
     std::vector<Mod> paksToInstall = removeModFromList(paksToUninstall, modPath);
 
-    if (m_HandlePakPatching) {
+    if (m_HandleNumericalPaks) {
         patchConfig(2, true);
     }
 

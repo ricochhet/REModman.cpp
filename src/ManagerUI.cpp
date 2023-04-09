@@ -77,9 +77,9 @@ void ManagerUI::drawGamePathFileDlg() {
         ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowSize().x * 0.5f, -1));
         if (ImGui::BeginPopupModal(m_SettingsLabel.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
             ImGui::SetWindowPos(ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2)));
-            m_HandlePakPatchingCheckBox = ManagerImpl::getInstance().getHandlePakPatching();
-            if (ImGui::Checkbox("Handle Pak Patching", &m_HandlePakPatchingCheckBox)) {
-                ManagerImpl::getInstance().setHandlePakPatching(m_HandlePakPatchingCheckBox);
+            m_HandleNumericalPaks = ManagerImpl::getInstance().getHandleNumericalPaks();
+            if (ImGui::Checkbox("Handle Pak Patching", &m_HandleNumericalPaks)) {
+                ManagerImpl::getInstance().setHandleNumericalPaks(m_HandleNumericalPaks);
             }
             ImGui::Separator();
             if (ImGui::Button("Exit", ImVec2(-1, 0))) {
@@ -121,7 +121,7 @@ void ManagerUI::drawAvailableMods() {
                     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
                     ImGui::InputInt("##LoadOrder", &m_LoadOrderInputInt);
 
-                    if (std::filesystem::is_directory(sourcePath / "natives") && ManagerImpl::getInstance().getHandlePakPatching()) {
+                    if (std::filesystem::is_directory(sourcePath / "natives") && ManagerImpl::getInstance().getHandleNumericalPaks()) {
                         ImGui::Separator();
 
                         if (ImGui::Button("RisePakPatch", ImVec2(-1, 0))) {
@@ -193,7 +193,7 @@ void ManagerUI::drawDeployBtn() {
     if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty() && !ManagerImpl::getInstance().getSelectedGamePath().empty()) {
         if (ImGui::Button("Deploy", ImVec2(-1, 0))) {
             for (int i = 0; i < ManagerImpl::getInstance().getInstalledModEntries().size(); i++) {
-                if (ManagerImpl::getInstance().getHandlePakPatching() && ManagerImpl::getInstance().containsPakFiles(ManagerImpl::getInstance().getInstalledModEntries()[i])) {
+                if (ManagerImpl::getInstance().getHandleNumericalPaks() && ManagerImpl::getInstance().containsPakFiles(ManagerImpl::getInstance().getInstalledModEntries()[i])) {
                     ManagerImpl::getInstance().doUninstallPak(ManagerImpl::getInstance().getInstalledModEntries()[i]);
                 } else {
                     ManagerImpl::getInstance().doUninstallMod(ManagerImpl::getInstance().getInstalledModEntries()[i]);
@@ -237,7 +237,7 @@ void ManagerUI::drawInstalledMods() {
                     );
 
                     if (ImGui::Button("Uninstall", ImVec2(-1, 0))) {
-                        if (ManagerImpl::getInstance().getHandlePakPatching() &&
+                        if (ManagerImpl::getInstance().getHandleNumericalPaks() &&
                             ManagerImpl::getInstance().containsPakFiles(ManagerImpl::getInstance().getInstalledModEntries()[i])) {
                             ManagerImpl::getInstance().doUninstallPak(ManagerImpl::getInstance().getInstalledModEntries()[i]);
                         } else {

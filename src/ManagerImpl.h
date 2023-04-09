@@ -19,13 +19,13 @@ public:
 
     std::string getSelectedGamePath() { return m_SelectedGamePath; }
 
-    bool getHandlePakPatching() { return m_HandlePakPatching; }
+    bool getHandleNumericalPaks() { return m_HandleNumericalPaks; }
 
     void setCurrentWorkingDirectory(const std::string& path);
     void setSelectedGamePath(const std::string& path);
     void setSelectedGamePath();
-    void setHandlePakPatching(const bool& valu);
-    void setHandlePakPatching();
+    void setHandleNumericalPaks(const bool& valu);
+    void setHandleNumericalPaks();
 
     //----------------------------------
     // [SECTION] Patch implementation
@@ -73,7 +73,7 @@ private:
     std::string m_CurrentWorkingDirectory;
     std::string m_SelectedGamePath;
     std::string m_SelectedGameName;
-    bool        m_HandlePakPatching;
+    bool        m_HandleNumericalPaks;
 
     //----------------------------------
     // [SECTION] Patch implementation

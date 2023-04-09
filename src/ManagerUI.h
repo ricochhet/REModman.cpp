@@ -69,7 +69,7 @@ private:
     std::string m_ProfileFileDlgKey;
     std::string m_GamePathFileDlgKey;
 
-    bool m_HandlePakPatchingCheckBox;
+    bool m_HandleNumericalPaks;
 };
 
 #endif  // REMODMAN_UI_INCLUDED
