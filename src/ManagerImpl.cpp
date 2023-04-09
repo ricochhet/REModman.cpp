@@ -114,13 +114,13 @@ void ManagerImpl::setSelectedGamePath() {
 void ManagerImpl::setHandleNumericalPaks(const bool& val) {
     if (!m_CurrentWorkingDirectory.empty()) {
         JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"HandleNumericalPaks"}, val, true);
-        bool value          = JsonUtils::getBool(m_CurrentWorkingDirectory + "/profile.json", {"HandleNumericalPaks"});
+        bool value            = JsonUtils::getBool(m_CurrentWorkingDirectory + "/profile.json", {"HandleNumericalPaks"});
         m_HandleNumericalPaks = value;
     }
 }
 
 void ManagerImpl::setHandleNumericalPaks() {
-    bool value          = JsonUtils::getBool(m_CurrentWorkingDirectory + "/profile.json", {"HandleNumericalPaks"});
+    bool value            = JsonUtils::getBool(m_CurrentWorkingDirectory + "/profile.json", {"HandleNumericalPaks"});
     m_HandleNumericalPaks = value;
 }
 
