@@ -33,6 +33,7 @@ void ManagerUI::drawProfileFileDlg() {
             if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty()) {
                 setProfileFileDlgLabel(std::format("Profile Context - {}", Utils::truncateString(ManagerImpl::getInstance().getCurrentWorkingDirectory(), 256)));
                 ManagerImpl::getInstance().setSelectedGamePath();
+                ManagerImpl::getInstance().setHandleNumericalPaks();
 
                 if (!ManagerImpl::getInstance().getSelectedGamePath().empty()) {
                     setGamePathFileDlgLabel(std::format("Game Context - {}", Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256)));
@@ -126,13 +127,15 @@ void ManagerUI::drawAvailableMods() {
                     if (std::filesystem::is_directory(sourcePath / "natives") && ManagerImpl::getInstance().getHandleNumericalPaks()) {
                         ImGui::Separator();
 
-                        if (ImGui::Button("RisePakPatch", ImVec2(-1, 0))) {
+                        if (ImGui::Button("RisePakPatch")) {
                             std::filesystem::path outputPath = sourcePath.string() + " Pak Version/" + (sourcePath.filename().string() + ".pak");
                             Utils::createDirectory(outputPath.parent_path());
                             RisePakPatch::processDirectory(sourcePath.string(), outputPath.string());
                             ManagerImpl::getInstance().refreshModEntries();
                             ImGui::CloseCurrentPopup();
                         }
+                        ImGui::SameLine();
+                        ShowHelpMarker("Compile the 'natives' folder of a mod into a pak file.");
                     }
                     ImGui::Separator();
                     if (ImGui::Button("Exit", ImVec2(-1, 0))) {
