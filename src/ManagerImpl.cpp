@@ -98,31 +98,17 @@ void ManagerImpl::setCurrentWorkingDirectory(const std::string& path) {
     JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"SelectedProfile"}, m_CurrentWorkingDirectory, true);
 }
 
-void ManagerImpl::setSelectedGameIndex(const int& index) {
+void ManagerImpl::setSelectedGamePath(const std::string& path) {
     if (!m_CurrentWorkingDirectory.empty()) {
-        JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"LastSelectedGame"}, index, true);
-        int value           = JsonUtils::getInt(m_CurrentWorkingDirectory + "/profile.json", {"LastSelectedGame"});
-        m_SelectedGameIndex = value;
+        JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"GamePath"}, path, true);
+        std::string value  = JsonUtils::getString(m_CurrentWorkingDirectory + "/profile.json", {"GamePath"});
+        m_SelectedGamePath = value;
     }
 }
 
-void ManagerImpl::setSelectedGameIndex() {
-    int value           = JsonUtils::getInt(m_CurrentWorkingDirectory + "/profile.json", {"LastSelectedGame"});
-    m_SelectedGameIndex = value;
-}
-
-void ManagerImpl::setSelectedGamePath(const std::string& path, const std::string& selectedGameName) {
-    if (!m_CurrentWorkingDirectory.empty()) {
-        std::string value  = JsonUtils::getString(m_CurrentWorkingDirectory + "/profile.json", {"Games", selectedGameName});
-        m_SelectedGameName = selectedGameName;
-
-        if (!value.empty()) {
-            m_SelectedGamePath = value;
-        } else if (value.empty() && !path.empty()) {
-            m_SelectedGamePath = path;
-            JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"Games", selectedGameName}, m_SelectedGamePath, true);
-        }
-    }
+void ManagerImpl::setSelectedGamePath() {
+    std::string value  = JsonUtils::getString(m_CurrentWorkingDirectory + "/profile.json", {"GamePath"});
+    m_SelectedGamePath = value;
 }
 
 void ManagerImpl::setHandlePakPatching(const bool& val) {

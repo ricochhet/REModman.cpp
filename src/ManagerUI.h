@@ -1,5 +1,5 @@
-#ifndef REMODMAN_INCLUDED
-#define REMODMAN_INCLUDED
+#ifndef REMODMAN_UI_INCLUDED
+#define REMODMAN_UI_INCLUDED
 
 #pragma once
 
@@ -40,9 +40,11 @@ public:
     // [SECTION] Manager implementation
     //----------------------------------
     void setupVars();
+    
     void drawProfileFileDlg();
+    void drawProfileFileDlgCtx();
     void drawGamePathFileDlg();
-    void drawGameSelector();
+    void drawGamePathFileDlgCtx();
 
     void drawAvailableMods();
     void drawStagedMods();
@@ -66,4 +68,4 @@ private:
     std::string m_GamePathFileDlgKey;
 };
 
-#endif  // REMODMAN_INCLUDED
+#endif  // REMODMAN_UI_INCLUDED

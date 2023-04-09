@@ -6,26 +6,22 @@ ManagerUI& ManagerUI::getInstance() {
 }
 
 void ManagerUI::setupVars() {
-    ManagerImpl::getInstance().setGameSelectionItems({"None", "MonsterHunterRise"});
-
     setProfileFileDlgLabel("Create or load a modding profile");
-    setGamePathFileDlgLabel("Find a game installation path for ");
+    setGamePathFileDlgLabel("Find a game installation path");
 
     setProfileFileDlgKey("##ProfileFileDlgKey");
     setGamePathFileDlgKey("##GamePathFileDlgKey");
 }
 
-void ManagerUI::drawProfileFileDlg() {
+void ManagerUI::drawProfileFileDlgCtx() {
     if (ImGui::Button(m_ProfileFileDlgLabel.c_str(), ImVec2(-1, 0))) {
         ImGuiFileDialog::Instance()->OpenDialog(m_ProfileFileDlgKey, "Choose Profile Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
     }
 
     ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
     ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
-    ImGui::SetNextWindowSize(size);
-    ImGui::SetNextWindowPos(ImVec2(center.x - (size.x * 0.5f), center.y - (size.y * 0.5f)));
 
-    if (ImGuiFileDialog::Instance()->Display(m_ProfileFileDlgKey, 32)) {
+    if (ImGuiFileDialog::Instance()->Display(m_ProfileFileDlgKey, 32, size, size, ImVec2(center.x - (size.x * 0.5f), center.y - (size.y * 0.5f)))) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
             std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
             ManagerImpl::getInstance().setCurrentWorkingDirectory(filePathName);
@@ -34,16 +30,40 @@ void ManagerUI::drawProfileFileDlg() {
             ManagerImpl::getInstance().patchConfig(2, false);
 
             if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty()) {
-                ManagerImpl::getInstance().setSelectedGameIndex();
-                ManagerImpl::getInstance().setSelectedGamePath("", ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()]);
                 setProfileFileDlgLabel(std::format("Profile Context - {}", Utils::truncateString(ManagerImpl::getInstance().getCurrentWorkingDirectory(), 256)));
+                ManagerImpl::getInstance().setSelectedGamePath();
 
                 if (!ManagerImpl::getInstance().getSelectedGamePath().empty()) {
-                    setGamePathFileDlgLabel(std::format(
-                        "Game Context ({}) - {}", ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()],
-                        Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256)
-                    ));
+                    setGamePathFileDlgLabel(std::format("Game Context - {}", Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256)));
+                } else {
+                    setGamePathFileDlgLabel("Find a game installation path");
                 }
+            }
+        }
+
+        ImGuiFileDialog::Instance()->Close();
+    }
+}
+
+void ManagerUI::drawProfileFileDlg() { drawProfileFileDlgCtx(); }
+
+void ManagerUI::drawGamePathFileDlgCtx() {
+    if (ImGui::Button(m_GamePathFileDlgLabel.c_str(), ImVec2(-1, 0))) {
+        ImGuiFileDialog::Instance()->OpenDialog(m_GamePathFileDlgKey, "Choose Game Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
+    }
+
+    ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
+    ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
+
+    if (ImGuiFileDialog::Instance()->Display(m_GamePathFileDlgKey, 32, size, size, ImVec2(center.x - (size.x * 0.5f), center.y - (size.y * 0.5f)))) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            ManagerImpl::getInstance().setSelectedGamePath(filePathName);
+
+            if (!ManagerImpl::getInstance().getSelectedGamePath().empty()) {
+                setGamePathFileDlgLabel(std::format("Game Context - {}", Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256)));
+            } else {
+                setGamePathFileDlgLabel("Find a game installation path");
             }
         }
 
@@ -53,69 +73,7 @@ void ManagerUI::drawProfileFileDlg() {
 
 void ManagerUI::drawGamePathFileDlg() {
     if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty()) {
-        if (ImGui::Button(m_GamePathFileDlgLabel.c_str(), ImVec2(-1, 0))) {
-            ImGuiFileDialog::Instance()->OpenDialog(m_GamePathFileDlgKey, "Choose Game Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
-        }
-
-        ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
-        ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
-        ImGui::SetNextWindowSize(size);
-        ImGui::SetNextWindowPos(ImVec2(center.x - (size.x * 0.5f), center.y - (size.y * 0.5f)));
-
-        if (ImGuiFileDialog::Instance()->Display(m_GamePathFileDlgKey, 32)) {
-            if (ImGuiFileDialog::Instance()->IsOk()) {
-                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                ManagerImpl::getInstance().setSelectedGamePath(filePathName, ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()]);
-
-                if (!ManagerImpl::getInstance().getSelectedGamePath().empty()) {
-                    setGamePathFileDlgLabel(std::format(
-                        "Game Context ({}) - {}", ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()],
-                        Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256)
-                    ));
-                }
-            }
-
-            ImGuiFileDialog::Instance()->Close();
-        }
-    }
-}
-
-void ManagerUI::drawGameSelector() {
-    if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty()) {
-        ImGui::PushItemWidth(-1);
-        ImGui::SetNextWindowSize(ImVec2(-1, 0));
-
-        if (ImGui::BeginCombo("##GameSelectorKey", ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()].c_str())) {
-            for (int i = 0; i < ManagerImpl::getInstance().getGameSelectionItems().size(); i++) {
-                bool isSelected = (ManagerImpl::getInstance().getSelectedGameIndex() == i);
-                
-                if (ImGui::Selectable(ManagerImpl::getInstance().getGameSelectionItems()[i].c_str(), isSelected)) {
-                    ManagerImpl::getInstance().setSelectedGameIndex(i);
-                    ManagerImpl::getInstance().setSelectedGamePath("", ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()]);
-
-                    if (ManagerImpl::getInstance().getSelectedGamePath().empty()) {
-                        setGamePathFileDlgLabel(
-                            "Find a game installation path for " + ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()]
-                        );
-                    } else {
-                        ManagerImpl::getInstance().setSelectedGamePath(
-                            ManagerImpl::getInstance().getSelectedGamePath(), ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()]
-                        );
-
-                        setGamePathFileDlgLabel(std::format(
-                            "Game Context ({}) - {}", ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()],
-                            Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256)
-                        ));
-                    }
-                }
-
-                if (isSelected) {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-
-            ImGui::EndCombo();
-        }
+        drawGamePathFileDlgCtx();
     }
 }
 
@@ -150,10 +108,9 @@ void ManagerUI::drawAvailableMods() {
                     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
                     ImGui::InputInt("##LoadOrder", &m_LoadOrderInputInt);
 
-                    if (std::filesystem::is_directory(sourcePath / "natives") &&
-                        ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()] == "MonsterHunterRise") {
+                    if (std::filesystem::is_directory(sourcePath / "natives") && ManagerImpl::getInstance().getHandlePakPatching()) {
                         ImGui::Separator();
-                        
+
                         if (ImGui::Button("RisePakPatch", ImVec2(-1, 0))) {
                             std::filesystem::path outputPath = sourcePath.string() + " Pak Version/" + (sourcePath.filename().string() + ".pak");
                             Utils::createDirectory(outputPath.parent_path());
@@ -223,8 +180,7 @@ void ManagerUI::drawDeployBtn() {
     if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty() && !ManagerImpl::getInstance().getSelectedGamePath().empty()) {
         if (ImGui::Button("Deploy", ImVec2(-1, 0))) {
             for (int i = 0; i < ManagerImpl::getInstance().getInstalledModEntries().size(); i++) {
-                if (ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()] == "MonsterHunterRise" &&
-                    ManagerImpl::getInstance().containsPakFiles(ManagerImpl::getInstance().getInstalledModEntries()[i])) {
+                if (ManagerImpl::getInstance().getHandlePakPatching() && ManagerImpl::getInstance().containsPakFiles(ManagerImpl::getInstance().getInstalledModEntries()[i])) {
                     ManagerImpl::getInstance().doUninstallPak(ManagerImpl::getInstance().getInstalledModEntries()[i]);
                 } else {
                     ManagerImpl::getInstance().doUninstallMod(ManagerImpl::getInstance().getInstalledModEntries()[i]);
@@ -268,7 +224,7 @@ void ManagerUI::drawInstalledMods() {
                     );
 
                     if (ImGui::Button("Uninstall", ImVec2(-1, 0))) {
-                        if (ManagerImpl::getInstance().getGameSelectionItems()[ManagerImpl::getInstance().getSelectedGameIndex()] == "MonsterHunterRise" &&
+                        if (ManagerImpl::getInstance().getHandlePakPatching() &&
                             ManagerImpl::getInstance().containsPakFiles(ManagerImpl::getInstance().getInstalledModEntries()[i])) {
                             ManagerImpl::getInstance().doUninstallPak(ManagerImpl::getInstance().getInstalledModEntries()[i]);
                         } else {

@@ -4,7 +4,6 @@
 void ImGuiWindow::setupImGuiWindow() {
     ManagerUI::getInstance().drawProfileFileDlg();
     ManagerUI::getInstance().drawGamePathFileDlg();
-    ManagerUI::getInstance().drawGameSelector();
 
     ManagerUI::getInstance().drawAvailableMods();
     ManagerUI::getInstance().drawStagedMods();

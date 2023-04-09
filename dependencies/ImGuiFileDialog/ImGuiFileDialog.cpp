@@ -3867,7 +3867,7 @@ namespace IGFD
 	///// FILE DIALOG DISPLAY FUNCTION ///////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
-	bool IGFD::FileDialog::Display(const std::string& vKey, ImGuiWindowFlags vFlags, ImVec2 vMinSize, ImVec2 vMaxSize)
+	bool IGFD::FileDialog::Display(const std::string& vKey, ImGuiWindowFlags vFlags, ImVec2 vMinSize, ImVec2 vMaxSize, ImVec2 vPos)
 	{
 		bool res = false;
 
@@ -3915,6 +3915,7 @@ namespace IGFD
 			else
 			{
 				ImGui::SetNextWindowSizeConstraints(vMinSize, vMaxSize);
+				ImGui::SetNextWindowPos(vPos);
 
 				if (prFileDialogInternal.puDLGflags & ImGuiFileDialogFlags_Modal &&
 					!prFileDialogInternal.puOkResultToConfirm) // disable modal because the confirm dialog for overwrite is a new modal

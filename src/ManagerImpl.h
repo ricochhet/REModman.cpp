@@ -17,21 +17,15 @@ public:
     //----------------------------------
     std::string getCurrentWorkingDirectory() { return m_CurrentWorkingDirectory; }
 
-    int getSelectedGameIndex() { return m_SelectedGameIndex; }
-
     std::string getSelectedGamePath() { return m_SelectedGamePath; }
 
     bool getHandlePakPatching() { return m_HandlePakPatching; }
 
-    void setGameSelectionItems(const std::vector<std::string>& items) { m_GameSelectionItems = items; }
-
-    void                     setCurrentWorkingDirectory(const std::string& path);
-    void                     setSelectedGameIndex(const int& index);
-    void                     setSelectedGameIndex();
-    void                     setSelectedGamePath(const std::string& path, const std::string& selectedGameName);
-    void                     setHandlePakPatching(const bool& valu);
-    void                     setHandlePakPatching();
-    std::vector<std::string> getGameSelectionItems() { return m_GameSelectionItems; }
+    void setCurrentWorkingDirectory(const std::string& path);
+    void setSelectedGamePath(const std::string& path);
+    void setSelectedGamePath();
+    void setHandlePakPatching(const bool& valu);
+    void setHandlePakPatching();
 
     //----------------------------------
     // [SECTION] Patch implementation
@@ -76,12 +70,10 @@ private:
     //----------------------------------
     // [SECTION] Config implementation
     //----------------------------------
-    std::string              m_CurrentWorkingDirectory;
-    int                      m_SelectedGameIndex;
-    std::string              m_SelectedGamePath;
-    std::string              m_SelectedGameName;
-    bool                     m_HandlePakPatching;
-    std::vector<std::string> m_GameSelectionItems;
+    std::string m_CurrentWorkingDirectory;
+    std::string m_SelectedGamePath;
+    std::string m_SelectedGameName;
+    bool        m_HandlePakPatching;
 
     //----------------------------------
     // [SECTION] Patch implementation

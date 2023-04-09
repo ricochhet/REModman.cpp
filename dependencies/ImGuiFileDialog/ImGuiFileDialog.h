@@ -1588,7 +1588,8 @@ namespace IGFD
 			const std::string& vKey,								// key dialog to display (if not the same key as defined by OpenDialog => no opening)
 			ImGuiWindowFlags vFlags = ImGuiWindowFlags_NoCollapse,	// ImGuiWindowFlags
 			ImVec2 vMinSize = ImVec2(0, 0),							// mininmal size contraint for the ImGuiWindow
-			ImVec2 vMaxSize = ImVec2(FLT_MAX, FLT_MAX));			// maximal size contraint for the ImGuiWindow
+			ImVec2 vMaxSize = ImVec2(FLT_MAX, FLT_MAX),			    // maximal size contraint for the ImGuiWindow
+			ImVec2 vPos  = ImVec2(0, 0));							// position for the ImGuiWindow
 		void Close();												// close dialog
 
 		// queries
