@@ -40,7 +40,7 @@ public:
     // [SECTION] Manager implementation
     //----------------------------------
     void setupVars();
-    
+
     void drawProfileFileDlg();
     void drawProfileFileDlgCtx();
     void drawGamePathFileDlg();
