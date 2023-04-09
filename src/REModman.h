@@ -8,6 +8,7 @@
 #include <ManagerImpl.h>
 #include <RisePakPatch.h>
 #include <imgui.h>
+#include <format>
 
 namespace FileDialog {
     void drawLoadProfileDlg();

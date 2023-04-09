@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(REModman)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 
 set(GLFW_DIR 
     "${CMAKE_SOURCE_DIR}/dependencies/glfw"

@@ -25,12 +25,10 @@ void FileDialog::drawLoadProfileDlg() {
             if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty()) {
                 ManagerImpl::getInstance().setSelectedGameIndex();
                 ManagerImpl::getInstance().setSelectedGamePath("", GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]);
-
-                loadProfileDlgBtnLabel = "(Profile) " + Utils::truncateString(ManagerImpl::getInstance().getCurrentWorkingDirectory(), 256);
-                getGameDlgBtnLabel     = getGameDlgBtnLabel + GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()];
+                loadProfileDlgBtnLabel = std::format("Profile Context - {}", Utils::truncateString(ManagerImpl::getInstance().getCurrentWorkingDirectory(), 256));
 
                 if (!ManagerImpl::getInstance().getSelectedGamePath().empty()) {
-                    getGameDlgBtnLabel = "(Game Location) " + Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256);
+                    getGameDlgBtnLabel = std::format("Game Context ({}) - {}", GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()], Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256));
                 }
             }
         }
@@ -54,7 +52,7 @@ void FileDialog::drawGetGamePathDlg() {
             ManagerImpl::getInstance().setSelectedGamePath(filePathName, GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]);
 
             if (!ManagerImpl::getInstance().getSelectedGamePath().empty()) {
-                getGameDlgBtnLabel = "(Game Location) " + Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256);
+                getGameDlgBtnLabel = std::format("Game Context ({}) - {}", GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()], Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256));
             }
         }
 
@@ -87,7 +85,7 @@ void REModman::drawGameSelector() {
                         ManagerImpl::getInstance().setSelectedGamePath(
                             ManagerImpl::getInstance().getSelectedGamePath(), GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]
                         );
-                        getGameDlgBtnLabel = "(Game Location) " + Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256);
+                        getGameDlgBtnLabel = std::format("Game Context ({}) - {}", GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()], Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256));
                     }
                 }
 
