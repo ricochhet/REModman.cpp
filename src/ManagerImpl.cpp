@@ -193,6 +193,30 @@ void ManagerImpl::refreshModEntries() {
     setInstalledModEntries();
 }
 
+void ManagerImpl::setGameFolders() {
+    m_GameFolders = JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["GameFolders"];
+}
+
+void ManagerImpl::addDefaultGameFolder() {
+    m_GameFolders.insert(m_GameFolders.begin(), "No game selected");
+}
+
+void ManagerImpl::addGameFolder(const std::string& path) {
+    std::vector<std::string> gameFolders = JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["GameFolders"];
+    gameFolders.push_back(path);
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"GameFolders"}, gameFolders, true);
+
+    m_GameFolders = gameFolders;
+}
+
+void ManagerImpl::removeGameFolder(const std::string& path) {
+    std::vector<std::string> gameFolders = JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["GameFolders"];
+    gameFolders.erase(std::remove(gameFolders.begin(), gameFolders.end(), path), gameFolders.end());
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"GameFolders"}, gameFolders, true);
+
+    m_GameFolders = gameFolders;
+}
+
 void ManagerImpl::setAvailableModEntries() { m_AvailableModEntries = getModEntries("InstalledMods", true); }
 
 void ManagerImpl::setStagedModEntries() { m_StagedModEntries = getModEntries("StagedMods", false); }
@@ -204,6 +228,7 @@ void ManagerImpl::doSetupChecks() {
     Utils::createDirectory(m_CurrentWorkingDirectory + "/Downloads/");
 
     JsonUtils::writeJson(m_CurrentWorkingDirectory + "/profile.json");
+    JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"GameFolders"}, nlohmann::json::array(), false);
     JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"StagedMods"}, nlohmann::json::array(), false);
     JsonUtils::updateJson(m_CurrentWorkingDirectory + "/profile.json", {"InstalledMods"}, nlohmann::json::array(), false);
 }

@@ -21,16 +21,18 @@ void FileDialog::drawLoadProfileDlg() {
             ManagerImpl::getInstance().patchConfig(2);
             ManagerImpl::getInstance().doSetupChecks();
             ManagerImpl::getInstance().refreshModEntries();
+            ManagerImpl::getInstance().setGameFolders();
+            ManagerImpl::getInstance().addDefaultGameFolder();
 
             if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty()) {
                 ManagerImpl::getInstance().setSelectedGameIndex();
                 ManagerImpl::getInstance().setSelectedGamePath("", GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]);
 
-                loadProfileDlgBtnLabel = "(Profile) " + Utils::truncateString(ManagerImpl::getInstance().getCurrentWorkingDirectory(), 256);
+                loadProfileDlgBtnLabel = "Profile Context - " + Utils::truncateString(ManagerImpl::getInstance().getCurrentWorkingDirectory(), 256);
                 getGameDlgBtnLabel     = getGameDlgBtnLabel + GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()];
 
                 if (!ManagerImpl::getInstance().getSelectedGamePath().empty()) {
-                    getGameDlgBtnLabel = "(Game Location) " + Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256);
+                    getGameDlgBtnLabel = "Game Context - " + Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256);
                 }
             }
         }
@@ -41,7 +43,7 @@ void FileDialog::drawLoadProfileDlg() {
 
 void FileDialog::drawGetGamePathDlg() {
     if (ImGui::Button(getGameDlgBtnLabel.c_str(), ImVec2(-1, 0))) {
-        ImGuiFileDialog::Instance()->OpenDialog("GetGameInstallDlgKey", "Choose Game Location", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
+        ImGuiFileDialog::Instance()->OpenDialog("GetGameInstallDlgKey", "Choose Game Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
     }
 
     ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
@@ -54,11 +56,55 @@ void FileDialog::drawGetGamePathDlg() {
             ManagerImpl::getInstance().setSelectedGamePath(filePathName, GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]);
 
             if (!ManagerImpl::getInstance().getSelectedGamePath().empty()) {
-                getGameDlgBtnLabel = "(Game Location) " + Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256);
+                getGameDlgBtnLabel = "Game Context - " + Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256);
             }
         }
 
         ImGuiFileDialog::Instance()->Close();
+    }
+}
+
+void REModman::drawAddGameFolderDlg() {
+    if (ImGui::Button("Add", ImVec2(ImGui::GetWindowSize().x * 0.25f, 0))) {
+        ImGuiFileDialog::Instance()->OpenDialog("AddGameFolderDlgKey", "Add Game Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
+    }
+
+    ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
+    ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
+    ImGui::SetNextWindowSize(size);
+    ImGui::SetNextWindowPos(ImVec2(center.x - (size.x * 0.5f), center.y - (size.y * 0.5f)));
+
+    if (ImGuiFileDialog::Instance()->Display("AddGameFolderDlgKey", 32)) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            ManagerImpl::getInstance().addGameFolder(filePathName);
+        }
+
+        ImGuiFileDialog::Instance()->Close();
+    }
+}
+
+void REModman::drawContextSelector() {
+    if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty())
+    {
+        ImGui::SetNextWindowSize(ImVec2(-1, 0));
+        ImGui::PushItemWidth(ImGui::GetWindowSize().x * 0.5f);
+        if (ImGui::BeginCombo("##DrawContextSelection", ManagerImpl::getInstance().getGameFolders()[ManagerImpl::getInstance().getSelectedGameIndex()].c_str())) {
+            for (int i = 0; i < ManagerImpl::getInstance().getGameFolders().size(); i++) {
+                bool isSelected = (ManagerImpl::getInstance().getSelectedGameIndex() == i);
+
+                if (ImGui::Selectable(ManagerImpl::getInstance().getGameFolders()[i].c_str(), isSelected)) {
+                    ManagerImpl::getInstance().setSelectedGameIndex(i);
+                }
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::SameLine();
+        drawAddGameFolderDlg();
+        ImGui::SameLine();
+        if (ImGui::Button("Remove", ImVec2(ImGui::GetWindowSize().x * 0.25f, 0))) {
+            ManagerImpl::getInstance().removeGameFolder(ManagerImpl::getInstance().getGameFolders()[ManagerImpl::getInstance().getSelectedGameIndex()]);
+        }
     }
 }
 
@@ -87,7 +133,7 @@ void REModman::drawGameSelector() {
                         ManagerImpl::getInstance().setSelectedGamePath(
                             ManagerImpl::getInstance().getSelectedGamePath(), GameSelection[ManagerImpl::getInstance().getSelectedGameIndex()]
                         );
-                        getGameDlgBtnLabel = "(Game Location) " + Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256);
+                        getGameDlgBtnLabel = "Game Context - " + Utils::truncateString(ManagerImpl::getInstance().getSelectedGamePath(), 256);
                     }
                 }
 
