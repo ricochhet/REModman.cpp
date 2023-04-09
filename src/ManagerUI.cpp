@@ -78,9 +78,11 @@ void ManagerUI::drawGamePathFileDlg() {
         if (ImGui::BeginPopupModal(m_SettingsLabel.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
             ImGui::SetWindowPos(ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2)));
             m_HandleNumericalPaks = ManagerImpl::getInstance().getHandleNumericalPaks();
-            if (ImGui::Checkbox("Handle Pak Patching", &m_HandleNumericalPaks)) {
+            if (ImGui::Checkbox("Handle Numerical Paks", &m_HandleNumericalPaks)) {
                 ManagerImpl::getInstance().setHandleNumericalPaks(m_HandleNumericalPaks);
             }
+            ImGui::SameLine();
+            ShowHelpMarker("Mods that follow the 're_chunk_000.pak.patch_XYZ' format, will automatically be numerically incremented.");
             ImGui::Separator();
             if (ImGui::Button("Exit", ImVec2(-1, 0))) {
                 ImGui::CloseCurrentPopup();
