@@ -196,6 +196,10 @@ void ManagerUI::drawStagedMods() {
 
 void ManagerUI::drawDeployBtn() {
     if (!ManagerImpl::getInstance().getCurrentWorkingDirectory().empty() && !ManagerImpl::getInstance().getSelectedGamePath().empty()) {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.15f, 0.68f, 0.37f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.25f, 0.78f, 0.47f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.75f, 0.98f, 0.67f, 1.0f});
+
         if (ImGui::Button("Deploy", ImVec2(-1, 0))) {
             for (int i = 0; i < ManagerImpl::getInstance().getInstalledModEntries().size(); i++) {
                 if (ManagerImpl::getInstance().getHandleNumericalPaks() && ManagerImpl::getInstance().containsPakFiles(ManagerImpl::getInstance().getInstalledModEntries()[i])) {
@@ -216,6 +220,10 @@ void ManagerUI::drawDeployBtn() {
 
             ManagerImpl::getInstance().refreshModEntries();
         }
+        
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
     }
 }
 
