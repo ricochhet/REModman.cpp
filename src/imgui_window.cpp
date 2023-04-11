@@ -13,9 +13,7 @@ void ImGuiWindow::setupImGuiFont(const ImGuiIO& io) {
     io.Fonts->Build();
 }
 
-void ImGuiWindow::setupImGuiStyle() {
-    ImGuiThemes::slateColorful();
-}
+void ImGuiWindow::setupImGuiStyle() { ImGuiThemes::slateColorful(); }
 
 int ImGuiWindow::createImGuiWindow(const char* title, const char* iconFileName, const char* iniFileName) {
     // Setup window
