@@ -194,7 +194,7 @@ void ManagerUI::drawStagedMods() {
                     }
                     ImGuiHelpers::PopColors();
                     ImGui::Separator();
-                    ImGuiHelpers::PushButtonColor({0.66f, 0.66f, 0.66f, 1.0f}); 
+                    ImGuiHelpers::PushButtonColor({0.66f, 0.66f, 0.66f, 1.0f});
                     if (ImGui::Button("Exit", ImVec2(-1, 0))) {
                         ImGui::CloseCurrentPopup();
                     }
