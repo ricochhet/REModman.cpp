@@ -11,6 +11,23 @@
 
 #include <format>
 
+class ImGuiHelpers {
+public:
+    static void PushButtonColor(ImVec4 vec) {
+        // clang-format off
+        ImGui::PushStyleColor(ImGuiCol_Button,          ImVec4{vec.x, vec.y, vec.z, vec.w});
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,   ImVec4{vec.x + 0.1f, vec.y + 0.1f, vec.z + 0.1f, vec.w});
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,    ImVec4{vec.x + 0.3f, vec.y + 0.3f, vec.z + 0.3f, vec.w});
+        // clang-format on
+    }
+
+    static void PopColors() {
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
+    }
+};
+
 class ManagerUI {
 public:
     static ManagerUI& Instance();

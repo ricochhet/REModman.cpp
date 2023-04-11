@@ -15,9 +15,11 @@ void ManagerUI::setupVars() {
 }
 
 void ManagerUI::drawProfileFileDlg() {
+    ImGuiHelpers::PushButtonColor({0.81f, 0.56f, 0.28f, 1.0f});
     if (ImGui::Button(m_ProfileFileDlgLabel.c_str(), ImVec2(-1, 0))) {
         ImGuiFileDialog::Instance()->OpenDialog(m_ProfileFileDlgKey, "Choose Profile Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
     }
+    ImGuiHelpers::PopColors();
 
     ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
     ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
@@ -49,9 +51,11 @@ void ManagerUI::drawProfileFileDlg() {
 
 void ManagerUI::drawGamePathFileDlg() {
     if (!ManagerImpl::Instance().getCurrentWorkingDirectory().empty()) {
+        ImGuiHelpers::PushButtonColor({0.81f, 0.56f, 0.28f, 1.0f});
         if (ImGui::Button(m_GamePathFileDlgLabel.c_str(), ImVec2(ImGui::GetWindowSize().x * 0.5f, 0))) {
             ImGuiFileDialog::Instance()->OpenDialog(m_GamePathFileDlgKey, "Choose Game Folder", nullptr, "", 1, nullptr, ImGuiFileDialogFlags_Modal);
         }
+        ImGuiHelpers::PopColors();
 
         ImVec2 size   = ImVec2(ImGui::GetContentRegionAvail().x * 0.95f, ImGui::GetContentRegionAvail().y * 0.95f);
         ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
@@ -71,9 +75,11 @@ void ManagerUI::drawGamePathFileDlg() {
             ImGuiFileDialog::Instance()->Close();
         }
         ImGui::SameLine();
+        ImGuiHelpers::PushButtonColor({0.81f, 0.56f, 0.28f, 1.0f});
         if (ImGui::Button(m_SettingsLabel.c_str(), ImVec2(ImGui::GetWindowSize().x * 0.5f, 0))) {
             ImGui::OpenPopup(m_SettingsLabel.c_str());
         }
+        ImGuiHelpers::PopColors();
 
         ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowSize().x * 0.5f, -1));
         if (ImGui::BeginPopupModal(m_SettingsLabel.c_str(), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
@@ -85,9 +91,11 @@ void ManagerUI::drawGamePathFileDlg() {
             ImGui::SameLine();
             ShowHelpMarker("Mods that follow the 're_chunk_000.pak.patch_XYZ' format, will automatically be numerically incremented.");
             ImGui::Separator();
+            ImGuiHelpers::PushButtonColor({0.66f, 0.66f, 0.66f, 1.0f});
             if (ImGui::Button("Exit", ImVec2(-1, 0))) {
                 ImGui::CloseCurrentPopup();
             }
+            ImGuiHelpers::PopColors();
             ImGui::EndPopup();
         }
     }
@@ -115,11 +123,13 @@ void ManagerUI::drawAvailableMods() {
                         ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2))
                     );
 
+                    ImGuiHelpers::PushButtonColor({0.54f, 0.73f, 0.32f, 1.0f});
                     if (ImGui::Button("Add", ImVec2(-1, 0))) {
                         ManagerImpl::Instance().doStageMod(ManagerImpl::Instance().getAvailableModEntries()[i], m_LoadOrderInputInt);
                         ManagerImpl::Instance().refreshModEntries();
                         ImGui::CloseCurrentPopup();
                     }
+                    ImGuiHelpers::PopColors();
 
                     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
                     ImGui::InputInt("##LoadOrder", &m_LoadOrderInputInt);
@@ -138,9 +148,11 @@ void ManagerUI::drawAvailableMods() {
                         ShowHelpMarker("Compile the 'natives' folder of a mod into a pak file.");
                     }
                     ImGui::Separator();
+                    ImGuiHelpers::PushButtonColor({0.66f, 0.66f, 0.66f, 1.0f});
                     if (ImGui::Button("Exit", ImVec2(-1, 0))) {
                         ImGui::CloseCurrentPopup();
                     }
+                    ImGuiHelpers::PopColors();
                     ImGui::EndPopup();
                 }
             }
@@ -174,15 +186,19 @@ void ManagerUI::drawStagedMods() {
                         ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2))
                     );
 
+                    ImGuiHelpers::PushButtonColor({0.81f, 0.56f, 0.28f, 1.0f});
                     if (ImGui::Button("Remove", ImVec2(-1, 0))) {
                         ManagerImpl::Instance().doUnstageMod(ManagerImpl::Instance().getStagedModEntries()[i]);
                         ManagerImpl::Instance().refreshModEntries();
                         ImGui::CloseCurrentPopup();
                     }
+                    ImGuiHelpers::PopColors();
                     ImGui::Separator();
+                    ImGuiHelpers::PushButtonColor({0.66f, 0.66f, 0.66f, 1.0f}); 
                     if (ImGui::Button("Exit", ImVec2(-1, 0))) {
                         ImGui::CloseCurrentPopup();
                     }
+                    ImGuiHelpers::PopColors();
                     ImGui::EndPopup();
                 }
             }
@@ -196,10 +212,9 @@ void ManagerUI::drawStagedMods() {
 
 void ManagerUI::drawDeployBtn() {
     if (!ManagerImpl::Instance().getCurrentWorkingDirectory().empty() && !ManagerImpl::Instance().getSelectedGamePath().empty()) {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.15f, 0.68f, 0.37f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.25f, 0.78f, 0.47f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.75f, 0.98f, 0.67f, 1.0f});
+        // ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.15f, 0.68f, 0.37f, 1.0f});
 
+        ImGuiHelpers::PushButtonColor({0.81f, 0.56f, 0.28f, 1.0f});
         if (ImGui::Button("Deploy", ImVec2(-1, 0))) {
             for (int i = 0; i < ManagerImpl::Instance().getInstalledModEntries().size(); i++) {
                 if (ManagerImpl::Instance().getHandleNumericalPaks() && ManagerImpl::Instance().containsPakFiles(ManagerImpl::Instance().getInstalledModEntries()[i])) {
@@ -220,10 +235,7 @@ void ManagerUI::drawDeployBtn() {
 
             ManagerImpl::Instance().refreshModEntries();
         }
-
-        ImGui::PopStyleColor();
-        ImGui::PopStyleColor();
-        ImGui::PopStyleColor();
+        ImGuiHelpers::PopColors();
     }
 }
 
@@ -249,9 +261,9 @@ void ManagerUI::drawInstalledMods() {
                         ImVec2((ImGui::GetIO().DisplaySize.x / 2) - (ImGui::GetWindowSize().x / 2), (ImGui::GetIO().DisplaySize.y / 2) - (ImGui::GetWindowSize().y / 2))
                     );
 
+                    ImGuiHelpers::PushButtonColor({0.3f, 0.76f, 0.96f, 1.0f});
                     if (ImGui::Button("Uninstall", ImVec2(-1, 0))) {
-                        if (ManagerImpl::Instance().getHandleNumericalPaks() &&
-                            ManagerImpl::Instance().containsPakFiles(ManagerImpl::Instance().getInstalledModEntries()[i])) {
+                        if (ManagerImpl::Instance().getHandleNumericalPaks() && ManagerImpl::Instance().containsPakFiles(ManagerImpl::Instance().getInstalledModEntries()[i])) {
                             ManagerImpl::Instance().doUninstallPak(ManagerImpl::Instance().getInstalledModEntries()[i]);
                         } else {
                             ManagerImpl::Instance().doUninstallMod(ManagerImpl::Instance().getInstalledModEntries()[i]);
@@ -260,10 +272,13 @@ void ManagerUI::drawInstalledMods() {
                         ManagerImpl::Instance().refreshModEntries();
                         ImGui::CloseCurrentPopup();
                     }
+                    ImGuiHelpers::PopColors();
                     ImGui::Separator();
+                    ImGuiHelpers::PushButtonColor({0.66f, 0.66f, 0.66f, 1.0f});
                     if (ImGui::Button("Exit", ImVec2(-1, 0))) {
                         ImGui::CloseCurrentPopup();
                     }
+                    ImGuiHelpers::PopColors();
                     ImGui::EndPopup();
                 }
             }
