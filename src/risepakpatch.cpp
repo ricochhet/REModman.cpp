@@ -1,4 +1,5 @@
 #include <risepakpatch.h>
+#include <writer.h>
 
 void RisePakPatch::processDirectory(const std::string& path, const std::string& outputFile) {
     std::string directory = std::filesystem::absolute(path).string();
@@ -27,7 +28,7 @@ void RisePakPatch::processDirectory(const std::string& path, const std::string& 
 
     Logger::getInstance().log("Processing " + std::to_string(sortedFiles.size()) + " files", LogLevel::Info);
     std::vector<FileEntry> list;
-    Utils::Writer          writer(outputFile);
+    Writer                 writer(outputFile);
     writer.writeUInt32(1095454795u);
     writer.writeUInt32(4u);
     writer.writeUInt32((uint32_t)sortedFiles.size());
