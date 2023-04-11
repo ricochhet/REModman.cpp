@@ -1,4 +1,4 @@
-#include "ManagerUI.h"
+#include "manager_ui.h"
 
 ManagerUI& ManagerUI::getInstance() {
     static ManagerUI instance;
@@ -220,7 +220,7 @@ void ManagerUI::drawDeployBtn() {
 
             ManagerImpl::getInstance().refreshModEntries();
         }
-        
+
         ImGui::PopStyleColor();
         ImGui::PopStyleColor();
         ImGui::PopStyleColor();

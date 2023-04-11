@@ -2,7 +2,7 @@
     #define STB_IMAGE_IMPLEMENTATION
 #endif  // STB_IMAGE_IMPLEMENTATION
 
-#include <ImGuiWindow.h>
+#include <imgui_window.h>
 #include <stb_image.h>
 
 static void glfwErrorCallback(int error, const char* description) { std::cerr << "GLFW Error " << error << ": " << description << std::endl; }

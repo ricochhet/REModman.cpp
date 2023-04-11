@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <Logger.h>
 #include <imgui.h>
+#include <logger.h>
 
 #include <iostream>
 #include <lua.hpp>

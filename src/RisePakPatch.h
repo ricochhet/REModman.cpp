@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Logger.h>
-#include <MurmurHash.h>
-#include <Utils.h>
+#include <logger.h>
+#include <murmurhash.h>
+#include <utils.h>
 
 #include <algorithm>
 #include <filesystem>

@@ -1,4 +1,4 @@
-#include <JsonUtils.h>
+#include <json_utils.h>
 
 nlohmann::json JsonUtils::loadJson(const std::string& path) {
     std::ifstream fileIn(path);

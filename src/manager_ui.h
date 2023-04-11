@@ -4,10 +4,10 @@
 #pragma once
 
 #include <ImGuiFileDialog.h>
-#include <Logger.h>
-#include <ManagerImpl.h>
-#include <RisePakPatch.h>
 #include <imgui.h>
+#include <logger.h>
+#include <manager_impl.h>
+#include <risepakpatch.h>
 
 #include <format>
 

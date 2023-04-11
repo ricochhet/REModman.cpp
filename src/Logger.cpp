@@ -1,4 +1,4 @@
-#include "Logger.h"
+#include "logger.h"
 
 Logger& Logger::getInstance() {
     static Logger instance;

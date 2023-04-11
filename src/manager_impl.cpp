@@ -1,4 +1,4 @@
-#include "ManagerImpl.h"
+#include "manager_impl.h"
 
 ManagerImpl& ManagerImpl::getInstance() {
     static ManagerImpl instance;
@@ -293,7 +293,7 @@ void ManagerImpl::doStageMod(const std::string& modPath, const int& stageIndex) 
     std::vector<File> modFiles          = getModFiles(modPath, false);
     Mod               modToStage        = createMod(modPath, modFiles);
     std::vector<Mod>  currentStagedMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["StagedMods"]);
-    size_t            stageIndexSizeT;
+    size_t            stageIndexSizeT = (int)stageIndex;
     if (stageIndexSizeT >= currentStagedMods.size()) {
         stageIndexSizeT = currentStagedMods.size();
     }

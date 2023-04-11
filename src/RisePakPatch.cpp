@@ -1,4 +1,4 @@
-#include <RisePakPatch.h>
+#include <risepakpatch.h>
 
 void RisePakPatch::processDirectory(const std::string& path, const std::string& outputFile) {
     std::string directory = std::filesystem::absolute(path).string();

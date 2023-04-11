@@ -1,5 +1,5 @@
-#include <ImGuiWindow.h>
-#include <ManagerUI.h>
+#include <imgui_window.h>
+#include <manager_ui.h>
 
 void ImGuiWindow::setupImGuiWindow() {
     ManagerUI::getInstance().drawProfileFileDlg();

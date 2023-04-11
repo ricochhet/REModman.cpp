@@ -1,4 +1,4 @@
-#include <MurmurHash.h>
+#include <murmurhash.h>
 
 uint32_t murmurhash3(const char* key, const uint32_t seed) {
     std::u16string u16_key;

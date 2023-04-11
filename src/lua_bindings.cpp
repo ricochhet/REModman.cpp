@@ -1,4 +1,4 @@
-#include <LuaBindings.h>
+#include <lua_bindings.h>
 
 int LuaBindings::logger(lua_State* L) {
     const char* str = lua_tostring(L, 1);
