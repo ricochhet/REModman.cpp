@@ -11,7 +11,7 @@
 
 class ManagerImpl {
 public:
-    static ManagerImpl& getInstance();
+    static ManagerImpl& Instance();
     //----------------------------------
     // [SECTION] Config implementation
     //----------------------------------

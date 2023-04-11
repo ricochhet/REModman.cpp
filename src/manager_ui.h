@@ -13,7 +13,7 @@
 
 class ManagerUI {
 public:
-    static ManagerUI& getInstance();
+    static ManagerUI& Instance();
 
     //----------------------------------
     // [SECTION] Manager implementation

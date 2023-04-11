@@ -10,7 +10,7 @@ enum class LogLevel { OK, Debug, Info, Warning, Error };
 
 class Logger {
 public:
-    static Logger& getInstance();
+    static Logger& Instance();
     void           setLogLevel(LogLevel level);
     int            getColorCode(LogLevel level);
     void           log(const std::string& message, LogLevel level = LogLevel::Info);

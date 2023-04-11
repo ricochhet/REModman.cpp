@@ -1,6 +1,6 @@
 #include "manager_impl.h"
 
-ManagerImpl& ManagerImpl::getInstance() {
+ManagerImpl& ManagerImpl::Instance() {
     static ManagerImpl instance;
     return instance;
 }
@@ -162,7 +162,7 @@ ManagerImpl::GenericPakPatch ManagerImpl::patchPak(const std::string& modPath) {
 
 bool ManagerImpl::containsPakFiles(const std::string& modPath) {
     if (!std::filesystem::exists(m_CurrentWorkingDirectory) || !std::filesystem::exists(modPath)) {
-        Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
+        Logger::Instance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
         return false;
     }
 
@@ -210,7 +210,7 @@ void ManagerImpl::doSetupChecks() {
 
 std::vector<std::string> ManagerImpl::getModDirectories() {
     if (!std::filesystem::exists(m_CurrentWorkingDirectory)) {
-        Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
+        Logger::Instance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
         return std::vector<std::string>();
     }
 
@@ -226,7 +226,7 @@ std::vector<std::string> ManagerImpl::getModDirectories() {
 
 std::vector<std::string> ManagerImpl::getModEntries(const std::string& key, const bool& compareWithDirectories) {
     if (!std::filesystem::exists(m_CurrentWorkingDirectory)) {
-        Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
+        Logger::Instance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
         return std::vector<std::string>();
     }
 
@@ -287,7 +287,7 @@ std::vector<ManagerImpl::File> ManagerImpl::getModFiles(const std::string& modPa
 
 void ManagerImpl::doStageMod(const std::string& modPath, const int& stageIndex) {
     if (!std::filesystem::exists(m_CurrentWorkingDirectory) || !std::filesystem::exists(modPath)) {
-        return Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
+        return Logger::Instance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
     }
 
     std::vector<File> modFiles          = getModFiles(modPath, false);
@@ -305,7 +305,7 @@ void ManagerImpl::doStageMod(const std::string& modPath, const int& stageIndex) 
 
 void ManagerImpl::doUnstageMod(const std::string& modPath) {
     if (!std::filesystem::exists(m_CurrentWorkingDirectory) || !std::filesystem::exists(modPath)) {
-        return Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
+        return Logger::Instance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
     }
 
     std::vector<Mod> currentStagedMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["StagedMods"]);
@@ -315,7 +315,7 @@ void ManagerImpl::doUnstageMod(const std::string& modPath) {
 
 void ManagerImpl::doInstallMod(const std::string& modPath) {
     if (!std::filesystem::exists(m_CurrentWorkingDirectory) || !std::filesystem::exists(modPath)) {
-        return Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
+        return Logger::Instance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
     }
 
     std::vector<File> modFiles = getModFiles(modPath, true);
@@ -349,7 +349,7 @@ void ManagerImpl::doUninstallMod(const std::string& modPath) {
 
 void ManagerImpl::doUninstallPak(const std::string& modPath) {
     if (!std::filesystem::exists(m_CurrentWorkingDirectory) || !std::filesystem::exists(modPath)) {
-        return Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
+        return Logger::Instance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
     }
 
     std::vector<Mod> currentInstalledMods = allJsonToMods(JsonUtils::loadJson(m_CurrentWorkingDirectory + "/profile.json")["InstalledMods"]);
@@ -381,7 +381,7 @@ void ManagerImpl::doUninstallPak(const std::string& modPath) {
 
 std::vector<ManagerImpl::Mod> ManagerImpl::removeModFromList(const std::vector<Mod>& listToRemoveFrom, const std::string& modPath) {
     if (!std::filesystem::exists(m_CurrentWorkingDirectory) || !std::filesystem::exists(modPath)) {
-        Logger::getInstance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
+        Logger::Instance().log("File not found: " + m_CurrentWorkingDirectory, LogLevel::Warning);
         return std::vector<Mod>();
     }
 

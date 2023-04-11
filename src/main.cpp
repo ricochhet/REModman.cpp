@@ -2,18 +2,18 @@
 #include <manager_ui.h>
 
 void ImGuiWindow::setupImGuiWindow() {
-    ManagerUI::getInstance().drawProfileFileDlg();
-    ManagerUI::getInstance().drawGamePathFileDlg();
+    ManagerUI::Instance().drawProfileFileDlg();
+    ManagerUI::Instance().drawGamePathFileDlg();
 
-    ManagerUI::getInstance().drawAvailableMods();
-    ManagerUI::getInstance().drawStagedMods();
-    ManagerUI::getInstance().drawDeployBtn();
-    ManagerUI::getInstance().drawInstalledMods();
+    ManagerUI::Instance().drawAvailableMods();
+    ManagerUI::Instance().drawStagedMods();
+    ManagerUI::Instance().drawDeployBtn();
+    ManagerUI::Instance().drawInstalledMods();
 }
 
 int main() {
-    Logger::getInstance().setLogLevel(LogLevel::Error);
-    Logger::getInstance().log("REModman Initialized.", LogLevel::OK);
-    ManagerUI::getInstance().setupVars();
+    Logger::Instance().setLogLevel(LogLevel::Error);
+    Logger::Instance().log("REModman Initialized.", LogLevel::OK);
+    ManagerUI::Instance().setupVars();
     ImGuiWindow::createImGuiWindow("REModman", "remodman-icon-1024.png", "remodman_ui.ini");
 }

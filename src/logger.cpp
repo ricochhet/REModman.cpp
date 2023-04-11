@@ -1,6 +1,6 @@
 #include "logger.h"
 
-Logger& Logger::getInstance() {
+Logger& Logger::Instance() {
     static Logger instance;
     return instance;
 }

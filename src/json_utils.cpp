@@ -8,7 +8,7 @@ nlohmann::json JsonUtils::loadJson(const std::string& path) {
         fileIn >> j;
         return j;
     } else {
-        Logger::getInstance().log("Failed to load JSON: " + path, LogLevel::Error);
+        Logger::Instance().log("Failed to load JSON: " + path, LogLevel::Error);
         return nlohmann::json();
     }
 }
@@ -20,7 +20,7 @@ void JsonUtils::writeJson(const std::string& fileName, const nlohmann::json& dat
         fileOut << j.dump(4) << std::endl;
         fileOut.close();
     } else {
-        Logger::getInstance().log("Failed to write JSON: " + fileName, LogLevel::Error);
+        Logger::Instance().log("Failed to write JSON: " + fileName, LogLevel::Error);
     }
 }
 
@@ -41,7 +41,7 @@ std::string JsonUtils::getString(const std::string& path, const std::vector<std:
         if (obj.contains(key)) {
             obj = obj[key];
         } else {
-            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            Logger::Instance().log("Key not found in JSON", LogLevel::Warning);
             return std::string();
         }
     }
@@ -55,7 +55,7 @@ std::string JsonUtils::getString(const nlohmann::json& j, const std::vector<std:
         if (obj.contains(key)) {
             obj = obj[key];
         } else {
-            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            Logger::Instance().log("Key not found in JSON", LogLevel::Warning);
             return std::string();
         }
     }
@@ -69,7 +69,7 @@ int JsonUtils::getInt(const std::string& path, const std::vector<std::string>& k
         if (obj.contains(key)) {
             obj = obj[key];
         } else {
-            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            Logger::Instance().log("Key not found in JSON", LogLevel::Warning);
             return 0;
         }
     }
@@ -83,7 +83,7 @@ int JsonUtils::getInt(const nlohmann::json& j, const std::vector<std::string>& k
         if (obj.contains(key)) {
             obj = obj[key];
         } else {
-            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            Logger::Instance().log("Key not found in JSON", LogLevel::Warning);
             return 0;
         }
     }
@@ -97,7 +97,7 @@ bool JsonUtils::getBool(const std::string& path, const std::vector<std::string>&
         if (obj.contains(key)) {
             obj = obj[key];
         } else {
-            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            Logger::Instance().log("Key not found in JSON", LogLevel::Warning);
             return false;
         }
     }
@@ -111,7 +111,7 @@ bool JsonUtils::getBool(const nlohmann::json& j, const std::vector<std::string>&
         if (obj.contains(key)) {
             obj = obj[key];
         } else {
-            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            Logger::Instance().log("Key not found in JSON", LogLevel::Warning);
             return false;
         }
     }
@@ -125,7 +125,7 @@ nlohmann::json JsonUtils::getJson(const std::string& path, const std::vector<std
         if (obj.contains(key)) {
             obj = obj[key];
         } else {
-            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            Logger::Instance().log("Key not found in JSON", LogLevel::Warning);
             return 0;
         }
     }
@@ -139,7 +139,7 @@ nlohmann::json JsonUtils::getJson(const nlohmann::json& j, const std::vector<std
         if (obj.contains(key)) {
             obj = obj[key];
         } else {
-            Logger::getInstance().log("Key not found in JSON", LogLevel::Warning);
+            Logger::Instance().log("Key not found in JSON", LogLevel::Warning);
             return 0;
         }
     }
@@ -179,7 +179,7 @@ void JsonUtils::updateJson(const std::string& path, const std::vector<std::strin
             } else {
                 if (key == keys.back()) {
                     if (update) {
-                        Logger::getInstance().log("Updating " + key + " in JSON", LogLevel::Info);
+                        Logger::Instance().log("Updating " + key + " in JSON", LogLevel::Info);
                         if (std::holds_alternative<std::string>(value)) {
                             *it = std::get<std::string>(value);
                         } else if (std::holds_alternative<int>(value)) {

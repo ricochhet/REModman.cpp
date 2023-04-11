@@ -2,7 +2,7 @@
 
 int LuaBindings::logger(lua_State* L) {
     const char* str = lua_tostring(L, 1);
-    Logger::getInstance().log(str, LogLevel::Warning);
+    Logger::Instance().log(str, LogLevel::Warning);
     return 0;
 }
 
